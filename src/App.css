@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #DDD;
+}
+
+b {
+    color: #FFF;
+}
+
+html, body, #root, #app {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+#app {
+    background: #090a0c;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 10px;
+    overflow: hidden;
+
+    border: 1px solid #303032;
+    box-sizing: border-box;
+}
+
+.modal .header {
+    background: #18181B;
+    padding: 10px;
+    box-sizing: border-box;
+
+    border-bottom: 1px solid #303032;
+}
+
+.modal .content {
+    flex: 1;
+    
+    padding: 10px;
+    box-sizing: border-box;
+
+    background: #18181B;
+}
+
+.modal .header p {
+    margin: 0;
+}

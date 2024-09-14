@@ -1,0 +1,34 @@
+{
+  "id": "c0bff209-aab1-4786-bedf-5c76fd55e935",
+  "name": "SAMPChatGUI",
+  "description": "lsrp-screens",
+  "requests": [],
+  "collections": [
+    {
+      "id": "aa248615-9f08-4bf6-8b6f-86ca923c4cc9",
+      "name": "Requests",
+      "requests": [
+        {
+          "id": "ab3c81f9-5152-4361-a55f-a42543f65643",
+          "name": "Render",
+          "type": "HTTP",
+          "data": {
+            "authorization": {
+              "type": "none"
+            },
+            "method": "POST",
+            "url": "http://localhost:8080/",
+            "headers": [],
+            "headersAutoRefresh": false,
+            "parameters": [],
+            "parametersAutoRefresh": false,
+            "body": {
+              "type": "application/json",
+              "body": "{\n  \"foo\": \"bar\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
