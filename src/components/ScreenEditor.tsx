@@ -1,7 +1,9 @@
 import { MouseEventHandler, WheelEvent, useCallback, useEffect, useState } from "react";
+import { ImageData } from "../App";
 
-type ScreenEditorProps = {
+export type ScreenEditorProps = {
     image: HTMLImageElement;
+    imageData: ImageData;
 
     initialPosition: [ number, number ];
     initialScale: number;
@@ -38,36 +40,46 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
         }
     }, [mouseDown, position, scale]);
 
+    useEffect(() => {
+        if(mouseDown) {
+            const mousemove = (event: MouseEvent) => {
+                if(!mouseDown || !mousePosition) {
+                    return;
+                }
+        
+                const difference = [Math.floor(event.pageX - mousePosition[0]), Math.floor(event.pageY - mousePosition[1])];
+        
+                if(mouseScale) {
+                    setMousePosition([ event.pageX, event.pageY ]);
+        
+                    const rect = (event.target as HTMLDivElement).getBoundingClientRect();
+        
+                    var deltaScale = (difference[1] / rect.height);
+        
+                    setScale(scale + deltaScale)
+        
+                    return;
+                }
+                else {
+                    setPosition([ position[0] - difference[0], position[1] - difference[1] ]);
+                    setMousePosition([ event.pageX, event.pageY ]);
+                }
+            };
+
+            document.addEventListener("mousemove", mousemove);
+
+            return () => {
+                document.removeEventListener("mousemove", mousemove);
+            };
+        }
+    }, [mouseDown, mousePosition, position, scale, mouseScale]);
+
     const handleMouseDown = useCallback<MouseEventHandler>((event) => {
         setMousePosition([ event.pageX, event.pageY ]);
         setMouseDown(true);
 
         setMouseScale(event.shiftKey);
     }, []);
-
-    const handleMouseMove = useCallback<MouseEventHandler<HTMLDivElement>>((event) => {
-        if(!mouseDown || !mousePosition) {
-            return;
-        }
-
-        const difference = [Math.floor(event.pageX - mousePosition[0]), Math.floor(event.pageY - mousePosition[1])];
-
-        if(mouseScale) {
-            setMousePosition([ event.pageX, event.pageY ]);
-
-            const rect = (event.target as HTMLDivElement).getBoundingClientRect();
-
-            var deltaScale = (difference[1] / rect.height);
-
-            setScale(scale + deltaScale)
-
-            return;
-        }
-        else {
-            setPosition([ position[0] - difference[0], position[1] - difference[1] ]);
-            setMousePosition([ event.pageX, event.pageY ]);
-        }
-    }, [ mouseDown, mousePosition, position, scale, mouseScale ]);
 
     const handleWheel = useCallback((event: WheelEvent) => {
         var deltaScale = (event.deltaY > 0) ? (-0.1) : (0.1);
@@ -78,7 +90,6 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
     return (
         <div 
             onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
             onWheel={handleWheel}
             style={{
                 cursor: "move",

@@ -1,7 +1,6 @@
 import { ChatData, ImageData } from "../App";
 
-let lastChatTopLength = 0;
-let lastChatBottomLength = 0;
+let lastChatData: ChatData | null = null;
 let lastChatImage: HTMLImageElement | null = null;
 let abortController: AbortController | undefined;
 
@@ -11,8 +10,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         canvas.height = imageData.height;
 
         lastChatImage = null;
-        lastChatTopLength = 0;
-        lastChatBottomLength = 0;
+        lastChatData = null;
     }
 
     const context = canvas.getContext("2d");
@@ -27,8 +25,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
     abortController = new AbortController();
 
+    const chatIsUsed = (chatData.top.length || chatData.bottom.length);
+    const chatNeedsRender = (!lastChatImage || lastChatData?.top.length != chatData.top.length || lastChatData?.bottom.length != chatData.bottom.length || lastChatData?.fontSize != chatData.fontSize);
 
-    if(chatData.top.length && chatData.bottom.length && (!lastChatImage || lastChatTopLength != chatData.top.length || lastChatBottomLength != chatData.bottom.length)) {
+    if(chatIsUsed && chatNeedsRender) {
         function handleLine(line: string) {
             let color = "FFFFFF";
 
@@ -58,10 +58,11 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         }
 
-        const response = await fetch("http://206.168.212.227:8080", {
+        const response = await fetch("http://localhost:8080", {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
+                fontSize: chatData.fontSize,
                 top: chatData.top.split('\n').map(handleLine),
                 bottom: chatData.bottom.split('\n').map(handleLine)
             })
@@ -88,8 +89,9 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         
             lastChatImage = chatImage;
-            lastChatTopLength = chatData.top.length;
-            lastChatBottomLength = chatData.bottom.length;
+            lastChatData = {
+                ...chatData
+            };
 
             context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
 
@@ -105,7 +107,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 0, 0, canvas.width, canvas.height);
         }
 
-        if(lastChatImage && lastChatTopLength == chatData.top.length && lastChatBottomLength == chatData.bottom.length) {
+        if(lastChatImage) {
             context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
         }
 

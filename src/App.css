@@ -1,3 +1,18 @@
+::-webkit-scrollbar-track
+{
+}
+
+::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: rgba(0, 0, 0, .1);
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: rgba(0, 0, 0, .4);
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
     color: #DDD;

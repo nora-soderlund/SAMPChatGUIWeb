@@ -1,7 +1,8 @@
-import { ChangeEvent, MouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { render } from "./functions/Render";
 import ScreenEditor from "./components/ScreenEditor";
+import ScreenEditorEx from "./components/ScreenEditorEx";
 
 export type ChatData = {
   top: string;
@@ -27,7 +28,7 @@ const defaultImageData: ImageData = {
   left: 0,
   top: 0,
 
-  scale: 2
+  scale: 1
 };
 
 const defaultChatData: ChatData = {
@@ -155,31 +156,16 @@ export default function App() {
                 flexDirection: "column",
                 gap: 10
               }}>
-                <div style={{
-                  background: "rgba(0, 0, 0, .2)",
-                  aspectRatio: image.width / image.height,
-                  width: "100%",
-                  overflow: "hidden",
-                  position: "relative"
-                }}>
-                  <img src={image.src} style={{
-                    width: "100%",
-                    height: "100%",
-                    userSelect: "none"
+                {(image) && (
+                  <ScreenEditorEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
+                    setImageData({
+                      ...imageData,
+                      left: position[0],
+                      top: position[1],
+                      scale
+                    })
                   }}/>
-
-                  <div style={{
-                    position: "absolute",
-                    left: `${(imageData.left / image.width) * 100}%`,
-                    top: `${(imageData.top / image.height) * 100}%`,
-                    width: `${(imageData.width / image.width) * (imageData.scale * 100)}%`,
-                    aspectRatio: imageData.width / imageData.height,
-                    background: "rgba(255, 255, 255, .1)",
-                    border: "1px solid white",
-                    cursor: "pointer",
-                    boxSizing: "border-box"
-                  }}/>
-                </div>
+                )}
 
                 <div style={{
                   display: "flex",
@@ -365,7 +351,7 @@ export default function App() {
                 position: "relative"
               }}>
                 {(image) && (
-                  <ScreenEditor image={image} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
+                  <ScreenEditor image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
                     setImageData({
                       ...imageData,
                       left: position[0],
