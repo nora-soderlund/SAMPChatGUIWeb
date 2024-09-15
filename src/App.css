@@ -17,37 +17,52 @@ body {
 }
 
 #app {
-    background: #090a0c;
+    background: #1a1c2f;
 }
 
 .modal {
     display: flex;
     flex-direction: column;
-
-    border-radius: 10px;
-    overflow: hidden;
-
-    border: 1px solid #303032;
-    box-sizing: border-box;
 }
 
 .modal .header {
-    background: #18181B;
     padding: 10px;
     box-sizing: border-box;
-
-    border-bottom: 1px solid #303032;
 }
 
 .modal .content {
     flex: 1;
-    
-    padding: 10px;
-    box-sizing: border-box;
-
-    background: #18181B;
+    width: 100%;
 }
 
 .modal .header p {
     margin: 0;
+}
+
+textarea, input[type=text], input[type=number], button {
+    border: 1px solid #363f50;
+    border-radius: 10px;
+    color: #FFF;
+    background: none;
+
+    width: 100%;
+
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+textarea:focus, input[type=text]:focus, input[type=number]:focus {
+    background: #161a2a !important;
+    outline: none;
+    /*border-color: rgba(255, 255, 255, .5);*/
+}
+
+button {
+    background: #1b4cb5;
+    border-width: 0;
+    cursor: pointer;
+}
+
+.secondary {
+    background: #283142;
 }

@@ -3,6 +3,13 @@ import { ChangeEvent, MouseEvent, useCallback, useEffect, useRef, useState } fro
 import { render } from "./functions/Render";
 import ScreenEditor from "./components/ScreenEditor";
 
+export type ChatData = {
+  top: string;
+  bottom: string;
+
+  fontSize: number;
+};
+
 export type ImageData = {
   left: number;
   top: number;
@@ -10,7 +17,7 @@ export type ImageData = {
   width: number;
   height: number;
 
-  scale: number;
+  scale: number;  
 };
 
 const defaultImageData: ImageData = {
@@ -19,29 +26,22 @@ const defaultImageData: ImageData = {
 
   left: 0,
   top: 0,
+
   scale: 2
 };
 
-const defaultResolutions = [
-  {
-    width: 800,
-    height: 600
-  },
-  {
-    width: 1280,
-    height: 720
-  },
-  {
-    width: 1920,
-    height: 1080
-  }
-];
+const defaultChatData: ChatData = {
+  top: "* Ray Maverick waves.",
+  bottom: "",
+
+  fontSize: 18
+};
 
 export default function App() {
   const imageRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [chat, setChat] = useState("* Ray Maverick waves.");
+  const [chatData, setChatData] = useState<ChatData>(defaultChatData);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
   
@@ -77,12 +77,8 @@ export default function App() {
       return;
     }
 
-    render(canvasRef.current!, null, imageData, chat);
-  }, [canvasRef.current, chat, imageData]);
-
-  const handleChatChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-    setChat(event.target.value);
-  }, []);
+    render(canvasRef.current!, null, imageData, chatData);
+  }, [canvasRef.current, chatData, imageData]);
 
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -116,6 +112,7 @@ export default function App() {
         height: "100%"
       }}>
         <div style={{
+          overflowY: "scroll",
           width: "20%",
           display: "flex",
           flexDirection: "column",
@@ -125,7 +122,8 @@ export default function App() {
         }}>
           {(!image)?(
             <div style={{
-              border: "3px dashed rgba(255, 255, 255, .5)",
+              border: "1px solid #283142",
+              background: "#1c2238",
               borderRadius: 10,
               padding: 10,
               display: "flex",
@@ -149,10 +147,14 @@ export default function App() {
           ):(
             <div className="modal">
               <div className="header">
-                <p>Image placement</p>
+                <p>Image</p>
               </div>
 
-              <div className="content">
+              <div className="content" style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10
+              }}>
                 <div style={{
                   background: "rgba(0, 0, 0, .2)",
                   aspectRatio: image.width / image.height,
@@ -178,6 +180,92 @@ export default function App() {
                     boxSizing: "border-box"
                   }}/>
                 </div>
+
+                <div style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 10,
+                  overflowX: "scroll"
+                }}>
+                  <div style={{
+                    flexBasis: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "rgba(0, 0, 0, .2)"
+                  }}>
+                    <img src={image.src} style={{
+                      aspectRatio: image.width / image.height,
+                      height: 60
+                    }}/>
+
+                    <small style={{ padding: 5 }}>Normal</small>
+                  </div>
+
+                  <div style={{
+                    flexBasis: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "rgba(0, 0, 0, .2)"
+                  }}>
+                    <img src={image.src} style={{
+                      height: 60,
+                      aspectRatio: image.width / image.height,
+                      filter: "grayscale(1)"
+                    }}/>
+
+                    <small style={{ padding: 5 }}>Grayscale</small>
+                  </div>
+
+                  <div style={{
+                    flexBasis: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "rgba(0, 0, 0, .2)"
+                  }}>
+                    <img src={image.src} style={{
+                      height: 60,
+                      aspectRatio: image.width / image.height,
+                      filter: "sepia(1)"
+                    }}/>
+
+                    <small style={{ padding: 5 }}>Sepia</small>
+                  </div>
+
+                  <div style={{
+                    flexBasis: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "rgba(0, 0, 0, .2)"
+                  }}>
+                    <img src={image.src} style={{
+                      height: 60,
+                      aspectRatio: image.width / image.height,
+                      filter: "saturate(2)"
+                    }}/>
+
+                    <small style={{ padding: 5 }}>Saturate</small>
+                  </div>
+
+                  <div style={{
+                    flexBasis: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "rgba(0, 0, 0, .2)"
+                  }}>
+                    <img src={image.src} style={{
+                      height: 60,
+                      aspectRatio: image.width / image.height,
+                      filter: "contrast(2)"
+                    }}/>
+
+                    <small style={{ padding: 5 }}>Contrast</small>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -188,14 +276,29 @@ export default function App() {
             </div>
             
             <div className="content">
-              <textarea value={chat} onChange={handleChatChange} style={{
+              <textarea value={chatData.top} onChange={(event) => setChatData({ ...chatData, top: event.target.value })} style={{
                 width: "100%",
-                height: 200,
+                height: 160,
                 background: "none",
                 resize: "none",
                 margin: 0,
-                padding: 0,
-                border: "none",
+                color: "#FFF"
+              }}/>
+            </div>
+          </div>
+
+          <div className="modal">
+            <div className="header">
+              <p>Bottom chat</p>
+            </div>
+            
+            <div className="content">
+              <textarea value={chatData.bottom} onChange={(event) => setChatData({ ...chatData, bottom: event.target.value })} style={{
+                width: "100%",
+                height: 160,
+                background: "none",
+                resize: "none",
+                margin: 0,
                 color: "#FFF"
               }}/>
             </div>
@@ -206,49 +309,35 @@ export default function App() {
               <p>Resolution</p>
             </div>
             
+            <div className="content" style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 10
+            }}>
+              <input type="number" value={imageData.width} style={{ flex: 1 }} onChange={(event) => setImageData({
+                ...imageData,
+                width: parseInt(event.target.value)
+              })}/>
+
+              <p>x</p>
+              
+              <input type="number" value={imageData.height} style={{ flex: 1 }} onChange={(event) => setImageData({
+                ...imageData,
+                height: parseInt(event.target.value)
+              })}/>
+            </div>
+          </div>
+
+          <div className="modal">
+            <div className="header">
+              <p>Font size</p>
+            </div>
+            
             <div className="content">
-              <div style={{
-                width: "100%",
-                overflowX: "scroll",
-                overflowY: "visible"
-              }}>
-                <div style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 10
-                }}>
-                  {defaultResolutions.map((resolution) => (
-                    <div key={resolution.width + resolution.height} style={{
-                      height: 100,
-                      width: 140,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}>
-                      <div style={{
-                        width: "100%",
-                        maxHeight: "100%",
-                        aspectRatio: resolution.width / resolution.height,
-                        border: `2px dashed ${(imageData.width === resolution.width && imageData.height === resolution.height)?("#FFF"):("rgba(255, 255, 255, .2)")}`,
-                        boxSizing: "border-box",
-                        borderRadius: 10,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer"
-                      }} onClick={() => {
-                        setImageData({
-                          ...imageData,
-                          width: resolution.width,
-                          height: resolution.height
-                        });
-                      }}>
-                        <p>{resolution.width}x{resolution.height}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <input type="number" value={chatData.fontSize} style={{ flex: 1 }} onChange={(event) => setChatData({
+                ...chatData,
+                fontSize: parseInt(event.target.value)
+              })}/>
             </div>
           </div>
         </div>
@@ -257,22 +346,23 @@ export default function App() {
           flex: 1,
           margin: 10
         }}>
-          <div className="header">
-            <p>Result</p>
-          </div>
-
           <div className="content" style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column"
           }}>
-            <div>
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 10
+            }}>
               <div style={{
-                  width: imageData.width,
-                  height: imageData.height,
-                  overflow: "hidden",
-                  position: "relative"
+                background: "rgba(0, 0, 0, .1)",
+                width: imageData.width,
+                height: imageData.height,
+                overflow: "hidden",
+                position: "relative"
               }}>
                 {(image) && (
                   <ScreenEditor image={image} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
@@ -294,6 +384,16 @@ export default function App() {
                   left: 0,
                   top: 0
                 }}/>
+              </div>
+
+              <div style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 10,
+                justifyContent: "flex-end"
+              }}>
+                <button style={{ width: 160 }}>Copy to clipboard</button>
+                <button className="secondary" style={{ width: 160 }}>Save to disk</button>
               </div>
             </div>
           </div>

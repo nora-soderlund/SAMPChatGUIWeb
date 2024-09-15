@@ -1,16 +1,18 @@
-import { ImageData } from "../App";
+import { ChatData, ImageData } from "../App";
 
-let lastChatLength = 0;
+let lastChatTopLength = 0;
+let lastChatBottomLength = 0;
 let lastChatImage: HTMLImageElement | null = null;
 let abortController: AbortController | undefined;
 
-export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, chat: string) {
+export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, chatData: ChatData) {
     if(canvas.width !== imageData.width || canvas.height !== imageData.height) {
         canvas.width = imageData.width;
         canvas.height = imageData.height;
 
         lastChatImage = null;
-        lastChatLength = 0;
+        lastChatTopLength = 0;
+        lastChatBottomLength = 0;
     }
 
     const context = canvas.getContext("2d");
@@ -26,39 +28,42 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     abortController = new AbortController();
 
 
-    if(chat.length && (!lastChatImage || lastChatLength != chat.length)) {
+    if(chatData.top.length && chatData.bottom.length && (!lastChatImage || lastChatTopLength != chatData.top.length || lastChatBottomLength != chatData.bottom.length)) {
+        function handleLine(line: string) {
+            let color = "FFFFFF";
+
+            if(line[0] === '[' && line[9] === ']') {
+                line = line.substring(11);
+            }
+
+            if(line.startsWith("* ")) {
+                color = "C2A4DA";
+            }
+            else if(line.startsWith("**[CH")) {
+                color = "B5AF8F";
+            }
+            else if(line.startsWith("** HQ")) {
+                color = "8D8DFF";
+            }
+            else if(line.startsWith("[Advertisement]") || line.startsWith("[Company Advertisement]")) {
+                color = "33AA33";
+            }
+            else if (line.startsWith("(Radio)")) {
+                color = "BFC0C2";
+            }
+
+            return {
+                message: line,
+                color
+            }
+        }
+
         const response = await fetch("http://206.168.212.227:8080", {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
-                lines: chat.split('\n').map((line) => {
-                    let color = "FFFFFF";
-
-                    if(line[0] === '[' && line[9] === ']') {
-                        line = line.substring(11);
-                    }
-
-                    if(line.startsWith("* ")) {
-                        color = "C2A4DA";
-                    }
-                    else if(line.startsWith("**[CH")) {
-                        color = "B5AF8F";
-                    }
-                    else if(line.startsWith("** HQ")) {
-                        color = "8D8DFF";
-                    }
-                    else if(line.startsWith("[Advertisement]") || line.startsWith("[Company Advertisement]")) {
-                        color = "33AA33";
-                    }
-                    else if (line.startsWith("(Radio)")) {
-                        color = "BFC0C2";
-                    }
-
-                    return {
-                        message: line,
-                        color
-                    }
-                })
+                top: chatData.top.split('\n').map(handleLine),
+                bottom: chatData.bottom.split('\n').map(handleLine)
             })
         });
 
@@ -83,7 +88,8 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         
             lastChatImage = chatImage;
-            lastChatLength = chat.length;
+            lastChatTopLength = chatData.top.length;
+            lastChatBottomLength = chatData.bottom.length;
 
             context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
 
@@ -99,7 +105,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 0, 0, canvas.width, canvas.height);
         }
 
-        if(lastChatImage && lastChatLength == chat.length) {
+        if(lastChatImage && lastChatTopLength == chatData.top.length && lastChatBottomLength == chatData.bottom.length) {
             context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
         }
 
