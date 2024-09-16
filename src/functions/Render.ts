@@ -79,7 +79,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if (line.startsWith("(Radio)")) {
                 color = "BFC0C2";
             }
-            else if (line.includes("says: ")) {
+            else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|whispers)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)) {
                 color = "E6E6E6";
             }
             else if (line.includes("shouts: ") || line.includes("screams: ")) {
