@@ -509,31 +509,32 @@ export default function App() {
             direction: "ltr",
             gap: 20,
           }}>
+          <div className="modal">
+            <div className="header">
+              <p>Preview</p>
+            </div>
+
+            <div className="content">
+              <div style={{
+                background: "rgba(0, 0, 0, .1)",
+                width: "100%",
+                aspectRatio: imageData.width / imageData.height,
+                overflow: "hidden",
+                position: "relative"
+              }}>
+                <canvas ref={previewRef} style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  left: 0,
+                  top: 0
+                }}/>
+              </div>
+            </div>
+          </div>
+          
           {(image) && (
             <>
-              <div className="modal">
-                <div className="header">
-                  <p>Preview</p>
-                </div>
-
-                <div className="content">
-                  <div style={{
-                    background: "rgba(0, 0, 0, .1)",
-                    width: "100%",
-                    aspectRatio: imageData.width / imageData.height,
-                    overflow: "hidden",
-                    position: "relative"
-                  }}>
-                    <canvas ref={previewRef} style={{
-                      width: "100%",
-                      height: "100%",
-                      position: "absolute",
-                      left: 0,
-                      top: 0
-                    }}/>
-                  </div>
-                </div>
-              </div>
 
               <div className="modal">
                 <div className="header">
