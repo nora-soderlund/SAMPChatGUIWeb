@@ -33,6 +33,8 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
     }, [cropper, cropperData]);
 
     useEffect(() => {
+        cropper?.destroy();
+
         if(containerRef.current) {
             const cropper = new Cropper(containerRef.current, {
                 aspectRatio: imageData.width / imageData.height,
@@ -50,7 +52,7 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
                 }
             });
         }
-    }, [containerRef]);
+    }, [containerRef, image]);
 
     return (
         <div 
