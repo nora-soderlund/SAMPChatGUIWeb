@@ -11,6 +11,7 @@ export type ChatData = {
 
   includeRadio: boolean;
   includeAutomatedActions: boolean;
+  includeBroadcasts: boolean;
 };
 
 type ImageDataOption = {
@@ -76,7 +77,8 @@ const defaultChatData: ChatData = {
   fontSize: 18,
 
   includeRadio: true,
-  includeAutomatedActions: false
+  includeAutomatedActions: false,
+  includeBroadcasts: false
 };
 
 const defaultCropperData: CropperData = {
@@ -405,7 +407,7 @@ export default function App() {
             
             <div className="content">
               <fieldset>
-                <input id="radio" type="checkbox" checked={chatData.includeRadio} onClick={() => setChatData({
+                <input id="radio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
                   ...chatData,
                   includeRadio: !chatData.includeRadio
                 })}/>
@@ -414,12 +416,21 @@ export default function App() {
               </fieldset>
               
               <fieldset>
-                <input id="radio" type="checkbox" checked={chatData.includeAutomatedActions} onClick={() => setChatData({
+                <input id="radio" type="checkbox" checked={chatData.includeAutomatedActions} onChange={() => setChatData({
                   ...chatData,
                   includeAutomatedActions: !chatData.includeAutomatedActions
                 })}/>
 
                 <label htmlFor="radio">Include automated actions</label>
+              </fieldset>
+              
+              <fieldset>
+                <input id="radio" type="checkbox" checked={chatData.includeBroadcasts} onChange={() => setChatData({
+                  ...chatData,
+                  includeBroadcasts: !chatData.includeBroadcasts
+                })}/>
+
+                <label htmlFor="radio">Include broadcasts (ads, news)</label>
               </fieldset>
             </div>
           </div>
@@ -532,7 +543,7 @@ export default function App() {
               </div>
             </div>
           </div>
-          
+
           {(image) && (
             <>
 

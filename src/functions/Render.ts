@@ -87,6 +87,27 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if (line.includes("shouts: ") || line.includes("screams: ")) {
                 color = "FFFFFF";
             }
+            else if(line.startsWith("[Company Advertisement]") || line.startsWith("[Advertisement]")) {
+                if(!chatData.includeBroadcasts) {
+                    return null;
+                }
+                
+                color = "33AA33";
+            }
+            else if(line.startsWith("[SAN]")) {
+                if(!chatData.includeBroadcasts) {
+                    return null;
+                }
+                
+                color = "FFEC8B";
+            }
+            else if(line.startsWith("[Government Announcement]")) {
+                if(!chatData.includeBroadcasts) {
+                    return null;
+                }
+                
+                color = "6495ED";
+            }
             else if(line.trim().length === 0) {
             }
             else {
