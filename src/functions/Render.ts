@@ -74,7 +74,8 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                     return null;
                 }
 
-                color = "B5AF8F";
+                //color = "B5AF8F";
+                color = "FFEC8B";
             }
             else if (line.startsWith("(Radio)")) {
                 color = "BFC0C2";
