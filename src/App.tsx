@@ -216,6 +216,25 @@ export default function App() {
     };
   }, [previewRef.current, image, chatData, cropperData, imageData]);
 
+  useEffect(() => {
+    if(image) {
+      let fontSize = 18;
+
+      if(image.width < 1024) {
+        fontSize = 14;
+      } else if(image.width == 1024) {
+        fontSize = 16;
+      } else {
+        fontSize = 18;
+      }
+
+      setChatData({
+        ...chatData,
+        fontSize
+      });
+    }
+  }, [ image ]);
+
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
