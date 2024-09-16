@@ -95,6 +95,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         }
 
         const response = await fetch("https://gui.sampscreens.com", {
+        //const response = await fetch("http://localhost:8080", {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({

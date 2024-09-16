@@ -201,7 +201,13 @@ export default function App() {
       return;
     }
 
-    render(previewRef.current, image, imageData, cropperData, chatData);
+    const timeout = setTimeout(() => {
+      render(previewRef.current!, image, imageData, cropperData, chatData);
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [previewRef.current, image, chatData, cropperData, imageData]);
 
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
