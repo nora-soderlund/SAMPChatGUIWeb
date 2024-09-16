@@ -4,6 +4,7 @@ import { render } from "./functions/Render";
 import ScreenEditor from "./components/ScreenEditor";
 import ScreenEditorEx from "./components/ScreenEditorEx";
 import ScreenCropperEx from "./components/ScreenCropperEx";
+import ImageCropper, { CropperData } from "./components/ImageCropper";
 
 export type ChatData = {
   top: string;
@@ -33,19 +34,30 @@ const defaultImageData: ImageData = {
 };
 
 const defaultChatData: ChatData = {
-  top: "* Ray Maverick waves.",
+  top: "", // "* Ray Maverick waves.",
   bottom: "",
 
   fontSize: 18
 };
 
+const defaultCropperData: CropperData = {
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 600,
+  scaleX: 1,
+  scaleY: 1
+};
+
 export default function App() {
   const imageRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewRef = useRef<HTMLCanvasElement>(null);
 
   const [chatData, setChatData] = useState<ChatData>(defaultChatData);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
+  const [cropperData, setCropperData] = useState<CropperData>(defaultCropperData);
   
   useEffect(() => {
     const mouseup = (event: WheelEvent) => {
@@ -79,8 +91,8 @@ export default function App() {
       return;
     }
 
-    render(canvasRef.current!, null, imageData, chatData);
-  }, [canvasRef.current, chatData, imageData]);
+    render(previewRef.current!, image, imageData, cropperData, chatData);
+  }, [previewRef.current, image, chatData, cropperData, imageData]);
 
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -150,47 +162,27 @@ export default function App() {
             <div>
               <div className="modal">
                 <div className="header">
-                  <p>Image Offset</p>
+                  <p>Preview</p>
                 </div>
 
-                <div className="content" style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10
-                }}>
-                  {(image) && (
-                    <ScreenEditorEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
-                      setImageData({
-                        ...imageData,
-                        left: position[0],
-                        top: position[1],
-                        scale
-                      })
+                <div className="content">
+                  <div style={{
+                    background: "rgba(0, 0, 0, .1)",
+                    width: "100%",
+                    aspectRatio: imageData.width / imageData.height,
+                    overflow: "hidden",
+                    position: "relative"
+                  }}>
+                    <canvas ref={previewRef} style={{
+                      width: "100%",
+                      height: "100%",
+                      pointerEvents: "none",
+                      userSelect: "none",
+                      position: "absolute",
+                      left: 0,
+                      top: 0
                     }}/>
-                  )}
-                </div>
-              </div>
-              
-              <div className="modal">
-                <div className="header">
-                  <p>Image Cropping</p>
-                </div>
-
-                <div className="content" style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10
-                }}>
-                  {(image) && (
-                    <ScreenCropperEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
-                      setImageData({
-                        ...imageData,
-                        left: position[0],
-                        top: position[1],
-                        scale
-                      })
-                    }}/>
-                  )}
+                  </div>
                 </div>
               </div>
 
@@ -205,10 +197,9 @@ export default function App() {
                   gap: 10
                 }}>
                   <div style={{
-                    display: "flex",
-                    flexDirection: "row",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
                     gap: 10,
-                    overflowX: "scroll"
                   }}>
                     <div style={{
                       flexBasis: 1,
@@ -218,8 +209,8 @@ export default function App() {
                       background: "rgba(0, 0, 0, .2)"
                     }}>
                       <img src={image.src} style={{
+                        width: "100%",
                         aspectRatio: image.width / image.height,
-                        height: 60
                       }}/>
 
                       <small style={{ padding: 5 }}>Normal</small>
@@ -233,7 +224,7 @@ export default function App() {
                       background: "rgba(0, 0, 0, .2)"
                     }}>
                       <img src={image.src} style={{
-                        height: 60,
+                        width: "100%",
                         aspectRatio: image.width / image.height,
                         filter: "grayscale(1)"
                       }}/>
@@ -249,7 +240,7 @@ export default function App() {
                       background: "rgba(0, 0, 0, .2)"
                     }}>
                       <img src={image.src} style={{
-                        height: 60,
+                        width: "100%",
                         aspectRatio: image.width / image.height,
                         filter: "sepia(1)"
                       }}/>
@@ -265,7 +256,7 @@ export default function App() {
                       background: "rgba(0, 0, 0, .2)"
                     }}>
                       <img src={image.src} style={{
-                        height: 60,
+                        width: "100%",
                         aspectRatio: image.width / image.height,
                         filter: "saturate(2)"
                       }}/>
@@ -281,7 +272,7 @@ export default function App() {
                       background: "rgba(0, 0, 0, .2)"
                     }}>
                       <img src={image.src} style={{
-                        height: 60,
+                        width: "100%",
                         aspectRatio: image.width / image.height,
                         filter: "contrast(2)"
                       }}/>
@@ -381,34 +372,44 @@ export default function App() {
               flexDirection: "column",
               gap: 10
             }}>
-              <div style={{
-                background: "rgba(0, 0, 0, .1)",
-                width: imageData.width,
-                height: imageData.height,
-                overflow: "hidden",
-                position: "relative"
-              }}>
-                {(image) && (
-                  <ScreenEditor image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
-                    setImageData({
-                      ...imageData,
-                      left: position[0],
-                      top: position[1],
-                      scale
-                    })
-                  }}/>
-                )}
+              {(image)?(
+                <div style={{
+                  background: "rgba(0, 0, 0, .1)",
+                  width: "100%",
+                  aspectRatio: image.width / image.height,
+                  position: "relative"
+                }}>
+                  <ImageCropper image={image} imageData={imageData} cropperData={cropperData} onChange={setCropperData}/>
 
-                <canvas ref={canvasRef} style={{
+                  <canvas ref={canvasRef} style={{
+                    width: imageData.width,
+                    height: imageData.height,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    position: "absolute",
+                    left: 0,
+                    top: "100%"
+                  }}/>
+                </div>
+              ):(
+                <div style={{
+                  background: "rgba(0, 0, 0, .1)",
                   width: imageData.width,
                   height: imageData.height,
-                  pointerEvents: "none",
-                  userSelect: "none",
-                  position: "absolute",
-                  left: 0,
-                  top: 0
-                }}/>
-              </div>
+                  overflow: "hidden",
+                  position: "relative"
+                }}>
+                  <canvas ref={canvasRef} style={{
+                    width: imageData.width,
+                    height: imageData.height,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    position: "absolute",
+                    left: 0,
+                    top: 0
+                  }}/>
+                </div>
+              )}
 
               <div style={{
                 display: "flex",

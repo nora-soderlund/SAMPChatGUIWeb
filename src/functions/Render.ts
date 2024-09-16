@@ -1,10 +1,11 @@
 import { ChatData, ImageData } from "../App";
+import { CropperData } from "../components/ImageCropper";
 
 let lastChatData: ChatData | null = null;
 let lastChatImage: HTMLImageElement | null = null;
 let abortController: AbortController | undefined;
 
-export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, chatData: ChatData) {
+export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, cropperData: CropperData, chatData: ChatData) {
     if(canvas.width !== imageData.width || canvas.height !== imageData.height) {
         canvas.width = imageData.width;
         canvas.height = imageData.height;
@@ -27,6 +28,12 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
     const chatIsUsed = (chatData.top.length || chatData.bottom.length);
     const chatNeedsRender = (!lastChatImage || lastChatData?.top.length != chatData.top.length || lastChatData?.bottom.length != chatData.bottom.length || lastChatData?.fontSize != chatData.fontSize);
+
+    const drawImage = () => {
+        context.drawImage(image!,
+            cropperData.x, cropperData.y, cropperData.width * cropperData.scaleX, cropperData.height * cropperData.scaleY,
+            0, 0, canvas.width, canvas.height);
+    }
 
     if(chatIsUsed && chatNeedsRender) {
         function handleLine(line: string) {
@@ -83,9 +90,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             if(image) {
-                context.drawImage(image,
-                    imageData.left / imageData.scale, imageData.top / imageData.scale, canvas.width / imageData.scale, canvas.height / imageData.scale,
-                    0, 0, canvas.width, canvas.height);
+                drawImage();
             }
         
             lastChatImage = chatImage;
@@ -102,9 +107,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         context.clearRect(0, 0, canvas.width, canvas.height);
         
         if(image) {
-            context.drawImage(image,
-                imageData.left / imageData.scale, imageData.top / imageData.scale, canvas.width / imageData.scale, canvas.height / imageData.scale,
-                0, 0, canvas.width, canvas.height);
+            drawImage();
         }
 
         if(lastChatImage) {

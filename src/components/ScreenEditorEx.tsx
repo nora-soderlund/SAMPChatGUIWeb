@@ -8,7 +8,6 @@ export default function ScreenEditorEx({ image, imageData, initialPosition, init
 
     const [ mouseDown, setMouseDown ] = useState(false);
     const [ mousePosition, setMousePosition ] = useState<[ number, number ] | null>(null);
-    const [ mouseOffset, setMouseOffset ] = useState<[ number, number ] | null>(null);
 
     useEffect(() => {
         setPosition(initialPosition);

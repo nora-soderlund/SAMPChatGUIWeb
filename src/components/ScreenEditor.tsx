@@ -60,10 +60,13 @@ export default function ScreenEditor({ image, imageData, initialPosition, initia
        
                     const scaleDifference = (scale + deltaScale) / scale;
                     const newScale = scale + deltaScale;
-                    
+
+                    const widthDifference = ((image.width * newScale) - (image.width * scale));
+                    const heightDifference = ((image.height * newScale) - (image.height * scale));
+
                     setPosition([
-                        (position[0] * scaleDifference),
-                        position[1] * scaleDifference
+                        (position[0] * scaleDifference),// + (widthDifference / 3),
+                        (position[1] * scaleDifference)// + (heightDifference / 2)
                     ]);
                     setScale(newScale);
         
