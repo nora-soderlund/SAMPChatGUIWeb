@@ -5,6 +5,8 @@ let lastChatData: ChatData | null = null;
 let lastChatImage: HTMLImageElement | null = null;
 let abortController: AbortController | undefined;
 
+declare const process: any;
+
 export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, cropperData: CropperData, chatData: ChatData) {
     if(canvas.width !== imageData.width || canvas.height !== imageData.height) {
         canvas.width = imageData.width;
@@ -92,7 +94,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         }
 
-        const response = await fetch("http://localhost:8080", {
+        const response = await fetch(process.env.REACT_APP_GUI_HOST, {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
