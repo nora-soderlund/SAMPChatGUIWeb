@@ -81,8 +81,21 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if (line.startsWith("(Radio)")) {
                 color = "BFC0C2";
             }
+            else if (line.includes(" says [low]: ") || /([A-Za-z]+\s[A-Za-z]+)\s+says(.*)\\[low\\](.*?):\s+(.*)/.test(line)) {
+                if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
+                    color = "FFFFFF";
+                }
+                else {
+                    color = "C8C8C8";
+                }
+            }
             else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|whispers)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)|| /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|whispers)(.*):\s+(.*)/.test(line)) {
-                color = "E6E6E6";
+                if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
+                    color = "FFFFFF";
+                }
+                else {
+                    color = "E6E6E6";
+                }
             }
             else if (line.includes("shouts: ") || line.includes("screams: ")) {
                 color = "FFFFFF";
@@ -127,7 +140,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
+                offset: chatData.offset,
+
                 fontSize: chatData.fontSize,
+
                 top: chatData.top.split('\n').map(handleLine).filter(Boolean),
                 bottom: chatData.bottom.split('\n').map(handleLine).filter(Boolean)
             })

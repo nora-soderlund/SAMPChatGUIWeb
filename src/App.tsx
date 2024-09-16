@@ -9,6 +9,12 @@ export type ChatData = {
 
   fontSize: number;
 
+  offset: {
+    left: number;
+    top: number;
+  };
+
+  characterName: string;
   includeRadio: boolean;
   includeAutomatedActions: boolean;
   includeBroadcasts: boolean;
@@ -75,6 +81,13 @@ const defaultChatData: ChatData = {
   bottom: "",
 
   fontSize: 18,
+
+  offset: {
+    left: 30,
+    top: 10
+  },
+
+  characterName: "",
 
   includeRadio: true,
   includeAutomatedActions: false,
@@ -199,6 +212,19 @@ export default function App() {
   }, [canvasRef.current, chat, image, imageData]);*/
 
   useEffect(() => {
+    const rawData = localStorage.getItem("options");
+
+    if(!rawData) {
+      return;
+    }
+
+    const parsedData = JSON.parse(rawData);
+
+    setImageData(parsedData.imageData);
+    setChatData(parsedData.chatData);
+  }, []);
+
+  useEffect(() => {
     if(!previewRef.current) {
       return;
     }
@@ -207,6 +233,11 @@ export default function App() {
       timeout = null;
 
       render(previewRef.current!, image, imageData, cropperData, chatData);
+      
+      localStorage.setItem("options", JSON.stringify({
+        imageData,
+        chatData
+      }));
     }, 300);
 
     return () => {
@@ -385,6 +416,7 @@ export default function App() {
           <div className="modal">
             <div className="header">
               <p>Resolution</p>
+              <p><small>How big your result image should be, default is 800x600.</small></p>
             </div>
             
             <div className="content" style={{
@@ -392,23 +424,83 @@ export default function App() {
               flexDirection: "row",
               gap: 10
             }}>
-              <input type="number" value={imageData.width} style={{ flex: 1 }} onChange={(event) => setImageData({
-                ...imageData,
-                width: parseInt(event.target.value)
-              })}/>
+              <div style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "row"
+              }}>
+                <p style={{ margin: "auto 10px" }}>Width:</p>
 
-              <p>x</p>
-              
-              <input type="number" value={imageData.height} style={{ flex: 1 }} onChange={(event) => setImageData({
-                ...imageData,
-                height: parseInt(event.target.value)
-              })}/>
+                <input type="number" value={imageData.width} style={{ flex: 1 }} onChange={(event) => setImageData({
+                  ...imageData,
+                  width: parseInt(event.target.value)
+                })}/>
+              </div>
+
+              <div style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "row"
+              }}>
+                <p style={{ margin: "auto 10px" }}>Height:</p>
+
+                <input type="number" value={imageData.height} style={{ flex: 1 }} onChange={(event) => setImageData({
+                  ...imageData,
+                  height: parseInt(event.target.value)
+                })}/>
+              </div>
+            </div>
+          </div>
+
+          <div className="modal">
+            <div className="header">
+              <p>Offsets</p>
+              <p><small>How far away the text should be from the edges, default is 30x10 in SAMP.</small></p>
+            </div>
+            
+            <div className="content" style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 10
+            }}>
+              <div style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "row"
+              }}>
+                <p style={{ margin: "auto 10px" }}>Left:</p>
+
+                <input type="number" value={chatData.offset.left} style={{ flex: 1 }} onChange={(event) => setChatData({
+                  ...chatData,
+                  offset: {
+                    ...chatData.offset,
+                    left: parseInt(event.target.value)
+                  }
+                })}/>
+              </div>
+
+              <div style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "row"
+              }}>
+                <p style={{ margin: "auto 10px" }}>Top:</p>
+
+                <input type="number" value={chatData.offset.top} style={{ flex: 1 }} onChange={(event) => setChatData({
+                  ...chatData,
+                  offset: {
+                    ...chatData.offset,
+                    top: parseInt(event.target.value)
+                  }
+                })}/>
+              </div>
             </div>
           </div>
 
           <div className="modal">
             <div className="header">
               <p>Font size</p>
+              <p><small>Font sizes varies by resolution. For 800x600, the recommended font size is 14.</small></p>
             </div>
             
             <div className="content">
@@ -421,35 +513,50 @@ export default function App() {
 
           <div className="modal">
             <div className="header">
+              <p>Character name</p>
+              <p><small>Your character name can be used to make /low's by you whiter than others.</small></p>
+            </div>
+            
+            <div className="content">
+              <input type="text" placeholder="John Doe" value={chatData.characterName} style={{ flex: 1 }} onChange={(event) => setChatData({
+                ...chatData,
+                characterName: event.target.value
+              })}/>
+
+            </div>
+          </div>
+
+          <div className="modal">
+            <div className="header">
               <p>Filtering</p>
             </div>
             
             <div className="content">
               <fieldset>
-                <input id="radio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
+                <input id="includeRadio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
                   ...chatData,
                   includeRadio: !chatData.includeRadio
                 })}/>
 
-                <label htmlFor="radio">Include radio</label>
+                <label htmlFor="includeRadio">Include radio</label>
               </fieldset>
               
               <fieldset>
-                <input id="radio" type="checkbox" checked={chatData.includeAutomatedActions} onChange={() => setChatData({
+                <input id="includeAutomatedActions" type="checkbox" checked={chatData.includeAutomatedActions} onChange={() => setChatData({
                   ...chatData,
                   includeAutomatedActions: !chatData.includeAutomatedActions
                 })}/>
 
-                <label htmlFor="radio">Include automated actions</label>
+                <label htmlFor="includeAutomatedActions">Include automated actions</label>
               </fieldset>
               
               <fieldset>
-                <input id="radio" type="checkbox" checked={chatData.includeBroadcasts} onChange={() => setChatData({
+                <input id="includeBroadcasts" type="checkbox" checked={chatData.includeBroadcasts} onChange={() => setChatData({
                   ...chatData,
                   includeBroadcasts: !chatData.includeBroadcasts
                 })}/>
 
-                <label htmlFor="radio">Include broadcasts (ads, news)</label>
+                <label htmlFor="includeBroadcasts">Include broadcasts (ads, news)</label>
               </fieldset>
             </div>
           </div>
