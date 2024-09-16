@@ -89,13 +89,16 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                     color = "C8C8C8";
                 }
             }
-            else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|whispers)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)|| /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|whispers)(.*):\s+(.*)/.test(line)) {
+            else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)|| /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)(.*):\s+(.*)/.test(line)) {
                 if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
                     color = "FFFFFF";
                 }
                 else {
                     color = "E6E6E6";
                 }
+            }
+            else if (line.includes(" whispers: ") || /([A-Za-z]+\s[A-Za-z]+)\s+whispers(.*):\s+(.*)/.test(line)) {
+                color = "FFFF00";
             }
             else if (line.includes("shouts: ") || line.includes("screams: ")) {
                 color = "FFFFFF";
