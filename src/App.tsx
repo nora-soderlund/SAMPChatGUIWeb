@@ -201,12 +201,16 @@ export default function App() {
       return;
     }
 
-    const timeout = setTimeout(() => {
+    let timeout: number | null = setTimeout(() => {
+      timeout = null;
+      
       render(previewRef.current!, image, imageData, cropperData, chatData);
     }, 300);
 
     return () => {
-      clearTimeout(timeout);
+      if(timeout !== null) {
+        clearTimeout(timeout);
+      }
     };
   }, [previewRef.current, image, chatData, cropperData, imageData]);
 
