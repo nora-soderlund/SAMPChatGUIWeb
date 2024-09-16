@@ -107,11 +107,11 @@ export default function App() {
   }, [canvasRef.current, chat, image, imageData]);*/
 
   useEffect(() => {
-    if(!canvasRef.current) {
+    if(!previewRef.current) {
       return;
     }
 
-    render(previewRef.current!, image, imageData, cropperData, chatData);
+    render(previewRef.current, image, imageData, cropperData, chatData);
   }, [previewRef.current, image, chatData, cropperData, imageData]);
 
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
