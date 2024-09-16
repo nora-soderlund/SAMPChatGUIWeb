@@ -82,6 +82,9 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if (line.includes("says: ")) {
                 color = "E6E6E6";
             }
+            else if (line.includes("shouts: ") || line.includes("screams: ")) {
+                color = "FFFFFF";
+            }
             else if(line.trim().length === 0) {
             }
             else {
