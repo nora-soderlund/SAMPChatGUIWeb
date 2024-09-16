@@ -60,13 +60,14 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 line = line.substring(11);
             }
 
-            if(line.startsWith("* ") && !line.startsWith("* [Vehicle alarm]") && !/\\*\s\(([A-Z][a-z]+_[A-Z][a-z]+)\):\s(.+)/.test(line)) {
+            if((line.startsWith("> ") || line.startsWith("* ")) && !line.startsWith("* [Vehicle alarm]") && !/\\*\s\(([A-Z][a-z]+_[A-Z][a-z]+)\):\s(.+)/.test(line)) {
                 if(!chatData.includeAutomatedActions) {
                     if(line.includes("started the engine") || line.includes("stopped the engine") || line.endsWith("checks the time.") || line.endsWith("takes their gun and badge from a locker.")) {
                         return null;
                     }
                 }
 
+                line = '*' + line.substring(1);
                 color = "C2A4DA";
             }
             else if(line.startsWith("**[CH")) {
