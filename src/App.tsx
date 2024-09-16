@@ -11,33 +11,75 @@ export type ChatData = {
   bottom: string;
 
   fontSize: number;
+
+  includeRadio: boolean;
+  includeAutomatedActions: boolean;
+};
+
+type ImageDataOption = {
+  enabled: boolean;
+  value: number;
+  maxValue: number;
 };
 
 export type ImageData = {
-  left: number;
-  top: number;
-
   width: number;
   height: number;
 
-  scale: number;  
+  options: {
+    brightness: ImageDataOption;
+    grayscale: ImageDataOption;
+    sepia: ImageDataOption;
+    saturate: ImageDataOption;
+    contrast: ImageDataOption;
+  };
 };
 
 const defaultImageData: ImageData = {
   width: 800,
   height: 600,
 
-  left: 0,
-  top: 0,
+  options: {
+    brightness: {
+      enabled: false,
+      value: 1,
+      maxValue: 2
+    },
+    
+    grayscale: {
+      enabled: false,
+      value: 1,
+      maxValue: 2
+    },
 
-  scale: 1
+    sepia: {
+      enabled: false,
+      value: 1,
+      maxValue: 1
+    },
+
+    saturate: {
+      enabled: false,
+      value: 2,
+      maxValue: 4
+    },
+
+    contrast: {
+      enabled: false,
+      value: 1.5,
+      maxValue: 3
+    }
+  }
 };
 
 const defaultChatData: ChatData = {
-  top: "", // "* Ray Maverick waves.",
+  top: "* Ray Maverick waves.",
   bottom: "",
 
-  fontSize: 18
+  fontSize: 18,
+
+  includeRadio: true,
+  includeAutomatedActions: false
 };
 
 const defaultCropperData: CropperData = {
@@ -58,25 +100,6 @@ export default function App() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
   const [cropperData, setCropperData] = useState<CropperData>(defaultCropperData);
-  
-  useEffect(() => {
-    const mouseup = (event: WheelEvent) => {
-      if(!event.shiftKey) {
-        return;
-      }
-
-      setImageData({
-        ...imageData,
-        scale: Math.max(imageData.scale + (event.deltaY / 10000), 0.01)
-      })
-    };
-
-    document.addEventListener("wheel", mouseup);
-
-    return () => {
-      document.removeEventListener("wheel", mouseup);
-    };
-  }, [imageData]);
 
   /*useEffect(() => {
     if(!canvasRef.current) {
@@ -105,11 +128,6 @@ export default function App() {
 
             image.onload = () => {
               setImage(image);
-              setImageData({
-                ...imageData,
-                left: (image.width - imageData.width) / 2,
-                top: (image.height - imageData.height) / 2,
-              });
             };
 
             image.src = e.target!.result as string;
@@ -127,14 +145,14 @@ export default function App() {
       }}>
         <div style={{
           overflowY: "scroll",
-          width: "20%",
+          width: "20vw",
           display: "flex",
           flexDirection: "column",
           padding: 10,
           boxSizing: "border-box",
           gap: 20
         }}>
-          {(!image)?(
+          {(!image) && (
             <div style={{
               border: "1px solid #283142",
               background: "#1c2238",
@@ -157,131 +175,6 @@ export default function App() {
               <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
                 display: "none"
               }}/>
-            </div>
-          ):(
-            <div>
-              <div className="modal">
-                <div className="header">
-                  <p>Preview</p>
-                </div>
-
-                <div className="content">
-                  <div style={{
-                    background: "rgba(0, 0, 0, .1)",
-                    width: "100%",
-                    aspectRatio: imageData.width / imageData.height,
-                    overflow: "hidden",
-                    position: "relative"
-                  }}>
-                    <canvas ref={previewRef} style={{
-                      width: "100%",
-                      height: "100%",
-                      pointerEvents: "none",
-                      userSelect: "none",
-                      position: "absolute",
-                      left: 0,
-                      top: 0
-                    }}/>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal">
-                <div className="header">
-                  <p>Filter</p>
-                </div>
-
-                <div className="content" style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10
-                }}>
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 10,
-                  }}>
-                    <div style={{
-                      flexBasis: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      background: "rgba(0, 0, 0, .2)"
-                    }}>
-                      <img src={image.src} style={{
-                        width: "100%",
-                        aspectRatio: image.width / image.height,
-                      }}/>
-
-                      <small style={{ padding: 5 }}>Normal</small>
-                    </div>
-
-                    <div style={{
-                      flexBasis: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      background: "rgba(0, 0, 0, .2)"
-                    }}>
-                      <img src={image.src} style={{
-                        width: "100%",
-                        aspectRatio: image.width / image.height,
-                        filter: "grayscale(1)"
-                      }}/>
-
-                      <small style={{ padding: 5 }}>Grayscale</small>
-                    </div>
-
-                    <div style={{
-                      flexBasis: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      background: "rgba(0, 0, 0, .2)"
-                    }}>
-                      <img src={image.src} style={{
-                        width: "100%",
-                        aspectRatio: image.width / image.height,
-                        filter: "sepia(1)"
-                      }}/>
-
-                      <small style={{ padding: 5 }}>Sepia</small>
-                    </div>
-
-                    <div style={{
-                      flexBasis: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      background: "rgba(0, 0, 0, .2)"
-                    }}>
-                      <img src={image.src} style={{
-                        width: "100%",
-                        aspectRatio: image.width / image.height,
-                        filter: "saturate(2)"
-                      }}/>
-
-                      <small style={{ padding: 5 }}>Saturate</small>
-                    </div>
-
-                    <div style={{
-                      flexBasis: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      background: "rgba(0, 0, 0, .2)"
-                    }}>
-                      <img src={image.src} style={{
-                        width: "100%",
-                        aspectRatio: image.width / image.height,
-                        filter: "contrast(2)"
-                      }}/>
-
-                      <small style={{ padding: 5 }}>Contrast</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -355,6 +248,32 @@ export default function App() {
               })}/>
             </div>
           </div>
+
+          <div className="modal">
+            <div className="header">
+              <p>Filtering</p>
+            </div>
+            
+            <div className="content">
+              <fieldset>
+                <input id="radio" type="checkbox" checked={chatData.includeRadio} onClick={() => setChatData({
+                  ...chatData,
+                  includeRadio: !chatData.includeRadio
+                })}/>
+
+                <label htmlFor="radio">Include radio</label>
+              </fieldset>
+              
+              <fieldset>
+                <input id="radio" type="checkbox" checked={chatData.includeAutomatedActions} onClick={() => setChatData({
+                  ...chatData,
+                  includeAutomatedActions: !chatData.includeAutomatedActions
+                })}/>
+
+                <label htmlFor="radio">Include automated actions</label>
+              </fieldset>
+            </div>
+          </div>
         </div>
 
         <div className="modal" style={{
@@ -375,7 +294,7 @@ export default function App() {
               {(image)?(
                 <div style={{
                   background: "rgba(0, 0, 0, .1)",
-                  width: "100%",
+                  width: "90%",
                   aspectRatio: image.width / image.height,
                   position: "relative"
                 }}>
@@ -410,6 +329,180 @@ export default function App() {
                   }}/>
                 </div>
               )}
+            </div>
+
+            <div style={{
+              width: "90%"
+            }}>
+              <p style={{
+                maxWidth: 600,
+                marginRight: "auto"
+              }}>
+                <small>
+                  This application is provided to the community of LS-RP since the previously used tool was abruptly brought down by its creator. This tool was put together on short notice and is continuously being worked on.
+                </small>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        
+        <div style={{
+          overflowY: "scroll",
+          width: "20vw",
+          padding: 10,
+          boxSizing: "border-box",
+          direction: "rtl"
+        }}>
+          <div style={{
+          display: "flex",
+          flexDirection: "column",
+            direction: "ltr",
+            gap: 20,
+          }}>
+          {(image) && (
+            <>
+              <div className="modal">
+                <div className="header">
+                  <p>Preview</p>
+                </div>
+
+                <div className="content">
+                  <div style={{
+                    background: "rgba(0, 0, 0, .1)",
+                    width: "100%",
+                    aspectRatio: imageData.width / imageData.height,
+                    overflow: "hidden",
+                    position: "relative"
+                  }}>
+                    <canvas ref={previewRef} style={{
+                      width: "100%",
+                      height: "100%",
+                      position: "absolute",
+                      left: 0,
+                      top: 0
+                    }}/>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal">
+                <div className="header">
+                  <p>Filter</p>
+                </div>
+
+                <div className="content" style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10
+                }}>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10,
+                  }}>
+                    {(() => {
+                      type OptionProps = {
+                        text: string;
+                        option: keyof ImageData["options"];
+                      };
+
+                      function Option({text, option }: OptionProps) {
+                        console.log(option);
+
+                        return (
+                          <div style={{
+                            flexBasis: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            background: "rgba(0, 0, 0, .2)",
+                            opacity: (imageData.options[option].enabled)?(1):(0.5),
+                            position: "relative"
+                          }}>
+                            <img src={image!.src} style={{
+                              width: "100%",
+                              aspectRatio: image!.width / image!.height,
+                              filter: `${option}(${defaultImageData.options[option].value})`
+                            }}/>
+      
+                            <small style={{ padding: 5 }}>{text}</small>
+      
+                            {(imageData.options[option].enabled)?(
+                              <div style={{
+                                position: "absolute",
+                                left: 0,
+                                top: 0,
+                                width: "100%",
+                                height: "100%",
+                                background: "rgba(0, 0, 0, .2)",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                flexDirection: "column"
+                              }}>
+                                <input type="range" min={0} max={imageData.options[option].maxValue} value={imageData.options[option].value} step={0.01} onChange={(event) =>  setImageData({
+                                  ...imageData,
+                                  options: {
+                                    ...imageData.options,
+                                    [option]: {
+                                      ...imageData.options[option],
+                                      value: parseFloat(event.target.value)
+                                    }
+                                  }
+                                })}/>
+      
+                                <p style={{
+                                  cursor: "pointer"
+                                }} onClick={() => setImageData({
+                                  ...imageData,
+                                  options: {
+                                    ...imageData.options,
+                                    [option]: {
+                                      ...imageData.options[option],
+                                      enabled: false
+                                    }
+                                  }
+                                })}>
+                                  Remove
+                                </p>
+                              </div>
+                            ):(
+                              <div style={{
+                                position: "absolute",
+                                left: 0,
+                                top: 0,
+                                width: "100%",
+                                height: "100%",
+                                cursor: "pointer"
+                              }} onClick={() => setImageData({
+                                ...imageData,
+                                options: {
+                                  ...imageData.options,
+                                  [option]: {
+                                    ...imageData.options[option],
+                                    enabled: true
+                                  }
+                                }
+                              })}/>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <>
+                          <Option key="brightness" text="Brightness" option="brightness"/>
+                          <Option key="grayscale" text="Grayscale" option="grayscale"/>
+                          <Option key="sepia" text="Sepia" option="sepia"/>
+                          <Option key="saturate" text="Saturate" option="saturate"/>
+                          <Option key="contrast" text="Contrast" option="contrast"/>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
 
               <div style={{
                 display: "flex",
@@ -417,10 +510,50 @@ export default function App() {
                 gap: 10,
                 justifyContent: "flex-end"
               }}>
-                <button style={{ width: 160 }}>Copy to clipboard</button>
-                <button className="secondary" style={{ width: 160 }}>Save to disk</button>
+                <button style={{ width: 160 }} onClick={() => {
+                  if(!previewRef.current) {
+                    return;
+                  }
+
+                  try {
+                    previewRef.current.toBlob(blob => blob && navigator.clipboard.write([
+                      new ClipboardItem({
+                        'image/png': blob
+                      })
+                    ]));
+
+                    alert("Copied to your clipboard.");
+                  }
+                  catch(error) {
+                    console.error(error);
+
+                    alert("Failed to copy to the clipboard.");
+                  }
+                }}>
+                  Copy to clipboard
+                </button>
+
+                <button className="secondary" style={{ width: 160 }} onClick={() => {
+                  if(!previewRef.current) {
+                    return;
+                  }
+                  
+                  const downloadLink = document.createElement('a');
+                  downloadLink.setAttribute('download', `Screenshot ${new Date().toISOString()}.png`);
+
+                  previewRef.current.toBlob(blob => {
+                    if(blob) {
+                      const url = URL.createObjectURL(blob);
+                      downloadLink.setAttribute('href', url);
+                      downloadLink.click();
+                    }
+                });
+                }}>
+                  Save to disk
+                </button>
               </div>
-            </div>
+            </>
+          )}
           </div>
         </div>
       </div>

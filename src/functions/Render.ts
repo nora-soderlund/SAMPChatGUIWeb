@@ -21,18 +21,33 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     }
 
     if(abortController) {
-        abortController.abort();
+        abortController.abort("New render started.");
     }
 
     abortController = new AbortController();
 
     const chatIsUsed = (chatData.top.length || chatData.bottom.length);
-    const chatNeedsRender = (!lastChatImage || lastChatData?.top.length != chatData.top.length || lastChatData?.bottom.length != chatData.bottom.length || lastChatData?.fontSize != chatData.fontSize);
+    const chatNeedsRender = (!lastChatImage || lastChatData?.top.length != chatData.top.length || lastChatData?.bottom.length != chatData.bottom.length || lastChatData?.fontSize != chatData.fontSize)
+        || (lastChatData.includeRadio !== chatData.includeRadio) || (lastChatData.includeAutomatedActions !== chatData.includeAutomatedActions);
 
     const drawImage = () => {
+        const filters: string[] = Object.entries(imageData.options).map(([ key, value ]) => {
+            if(!value.enabled) {
+                return "";
+            }
+
+            return `${key}(${value.value})`;
+        });
+
+        context.save();
+
+        context.filter = filters.filter(Boolean).join(' ');
+
         context.drawImage(image!,
             cropperData.x, cropperData.y, cropperData.width * cropperData.scaleX, cropperData.height * cropperData.scaleY,
             0, 0, canvas.width, canvas.height);
+
+        context.restore();
     }
 
     if(chatIsUsed && chatNeedsRender) {
@@ -43,20 +58,32 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 line = line.substring(11);
             }
 
-            if(line.startsWith("* ")) {
+            if(line.startsWith("* ") && !line.startsWith("* [Vehicle alarm]") && !/\\*\s\(([A-Z][a-z]+_[A-Z][a-z]+)\):\s(.+)/.test(line)) {
+                if(!chatData.includeAutomatedActions) {
+                    if(line.includes("started the engine") || line.includes("stopped the engine") || line.endsWith("checks the time.") || line.endsWith("takes their gun and badge from a locker.")) {
+                        return null;
+                    }
+                }
+
                 color = "C2A4DA";
             }
             else if(line.startsWith("**[CH")) {
+                if(!chatData.includeRadio) {
+                    return null;
+                }
+
                 color = "B5AF8F";
-            }
-            else if(line.startsWith("** HQ")) {
-                color = "8D8DFF";
-            }
-            else if(line.startsWith("[Advertisement]") || line.startsWith("[Company Advertisement]")) {
-                color = "33AA33";
             }
             else if (line.startsWith("(Radio)")) {
                 color = "BFC0C2";
+            }
+            else if (line.includes("says: ")) {
+                color = "E6E6E6";
+            }
+            else {
+                console.log("Ignoring: " + line);
+
+                return null;
             }
 
             return {
@@ -70,8 +97,8 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             signal: abortController.signal,
             body: JSON.stringify({
                 fontSize: chatData.fontSize,
-                top: chatData.top.split('\n').map(handleLine),
-                bottom: chatData.bottom.split('\n').map(handleLine)
+                top: chatData.top.split('\n').map(handleLine).filter(Boolean),
+                bottom: chatData.bottom.split('\n').map(handleLine).filter(Boolean)
             })
         });
 

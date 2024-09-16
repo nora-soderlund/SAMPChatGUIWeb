@@ -37,6 +37,8 @@ body {
 
 #app {
     background: #1a1c2f;
+
+    overflow: hidden;
 }
 
 .modal {
@@ -84,4 +86,8 @@ button {
 
 .secondary {
     background: #283142;
+}
+
+fieldset {
+    border: none;
 }
