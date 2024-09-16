@@ -94,7 +94,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         }
 
-        const response = await fetch(process.env.REACT_APP_GUI_HOST, {
+        const response = await fetch("https://gui.sampscreens.com", {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
