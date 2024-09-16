@@ -1,9 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { render } from "./functions/Render";
-import ScreenEditor from "./components/ScreenEditor";
-import ScreenEditorEx from "./components/ScreenEditorEx";
-import ScreenCropperEx from "./components/ScreenCropperEx";
 import ImageCropper, { CropperData } from "./components/ImageCropper";
 
 export type ChatData = {

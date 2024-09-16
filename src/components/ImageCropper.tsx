@@ -1,5 +1,4 @@
-import { MouseEventHandler, WheelEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ScreenEditorProps } from "./ScreenEditor";
+import { useEffect, useRef, useState } from "react";
 import Cropper from "cropperjs";
 import { ImageData } from "../App";
 
