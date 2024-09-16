@@ -635,7 +635,7 @@ export default function App() {
         
         <div style={{
           overflowY: "scroll",
-          width: "20vw",
+          width: "25vw",
           padding: 10,
           boxSizing: "border-box",
           direction: "rtl"
