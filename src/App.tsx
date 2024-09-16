@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, DragEventHandler, useCallback, useEffect, useRef, useState } from "react";
 
 import { render } from "./functions/Render";
 import ImageCropper, { CropperData } from "./components/ImageCropper";
@@ -224,6 +224,56 @@ export default function App() {
     }
   }, [imageData]);
 
+  const handleDrop = useCallback((event: DragEvent) => {
+    event.preventDefault();
+
+    if (event.dataTransfer.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      for(let item of event.dataTransfer.items) {
+        // If dropped items aren't files, reject them
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+
+          if(file) {
+            const reader = new FileReader();
+    
+            reader.onload = (e) => {
+                const image = new Image();
+    
+                image.onload = () => {
+                  setImage(image);
+                };
+    
+                image.src = e.target!.result as string;
+            };
+    
+            reader.readAsDataURL(file);
+
+            return;
+          }
+        }
+      }
+    }
+
+    for(let file of event.dataTransfer.files) {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+          const image = new Image();
+
+          image.onload = () => {
+            setImage(image);
+          };
+
+          image.src = e.target!.result as string;
+      };
+
+      reader.readAsDataURL(file);
+
+      return;
+    }
+  }, []);
+
   return (
     <div id="app">
       <div style={{
@@ -239,31 +289,33 @@ export default function App() {
           boxSizing: "border-box",
           gap: 20
         }}>
-          {(!image) && (
-            <div style={{
-              border: "1px solid #283142",
-              background: "#1c2238",
-              borderRadius: 10,
-              padding: 10,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              boxSizing: "border-box",
-              cursor: "pointer"
-            }} onClick={() => imageRef.current?.click()}>
-              <p style={{
-                textAlign: "center"
-              }}>
-                <b>Choose an image or drag & drop it here</b><br/>
-                Any image format that your browser supports is supported, no size limit
-              </p>
+          <div style={{
+            border: "1px solid #283142",
+            background: "#1c2238",
+            borderRadius: 10,
+            padding: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            boxSizing: "border-box",
+            cursor: "pointer"
+          }}
+          onDrop={handleDrop}
+          onDragOver={(event) => event.preventDefault()}
+          onClick={() => imageRef.current?.click()}
+          >
+            <p style={{
+              textAlign: "center"
+            }}>
+              <b>Choose an image or drag & drop it here</b><br/>
+              Any image format that your browser supports is supported, no size limit
+            </p>
 
-              <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
-                display: "none"
-              }}/>
-            </div>
-          )}
+            <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
+              display: "none"
+            }}/>
+          </div>
 
           <div className="modal">
             <div className="header">
