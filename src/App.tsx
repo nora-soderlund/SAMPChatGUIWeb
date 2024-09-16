@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEvent, DragEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { render } from "./functions/Render";
 import ImageCropper, { CropperData } from "./components/ImageCropper";
@@ -203,7 +203,7 @@ export default function App() {
 
     let timeout: number | null = setTimeout(() => {
       timeout = null;
-      
+
       render(previewRef.current!, image, imageData, cropperData, chatData);
     }, 300);
 
