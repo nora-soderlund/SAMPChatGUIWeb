@@ -1,4 +1,4 @@
-import { MouseEventHandler, WheelEvent, useCallback, useEffect, useState } from "react";
+import { MouseEventHandler, WheelEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ImageData } from "../App";
 
 export type ScreenEditorProps = {
@@ -11,7 +11,9 @@ export type ScreenEditorProps = {
     onChange: (position: [number, number], scale: number) => void;
 };
 
-export default function ScreenEditor({ image, initialPosition, initialScale, onChange }: ScreenEditorProps) {
+export default function ScreenEditor({ image, imageData, initialPosition, initialScale, onChange }: ScreenEditorProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    
     const [ position, setPosition ] = useState(initialPosition);
     const [ scale, setScale ] = useState(initialScale);
 
@@ -43,7 +45,7 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
     useEffect(() => {
         if(mouseDown) {
             const mousemove = (event: MouseEvent) => {
-                if(!mouseDown || !mousePosition) {
+                if(!mouseDown || !mousePosition || !containerRef.current) {
                     return;
                 }
         
@@ -52,11 +54,18 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
                 if(mouseScale) {
                     setMousePosition([ event.pageX, event.pageY ]);
         
-                    const rect = (event.target as HTMLDivElement).getBoundingClientRect();
+                    const rect = containerRef.current.getBoundingClientRect();
         
                     var deltaScale = (difference[1] / rect.height);
-        
-                    setScale(scale + deltaScale)
+       
+                    const scaleDifference = (scale + deltaScale) / scale;
+                    const newScale = scale + deltaScale;
+                    
+                    setPosition([
+                        (position[0] * scaleDifference),
+                        position[1] * scaleDifference
+                    ]);
+                    setScale(newScale);
         
                     return;
                 }
@@ -72,7 +81,7 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
                 document.removeEventListener("mousemove", mousemove);
             };
         }
-    }, [mouseDown, mousePosition, position, scale, mouseScale]);
+    }, [containerRef.current, mouseDown, mousePosition, position, imageData, scale, mouseScale]);
 
     const handleMouseDown = useCallback<MouseEventHandler>((event) => {
         setMousePosition([ event.pageX, event.pageY ]);
@@ -89,6 +98,7 @@ export default function ScreenEditor({ image, initialPosition, initialScale, onC
 
     return (
         <div 
+            ref={containerRef}
             onMouseDown={handleMouseDown}
             onWheel={handleWheel}
             style={{

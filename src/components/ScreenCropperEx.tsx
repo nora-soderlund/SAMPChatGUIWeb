@@ -1,7 +1,7 @@
 import { MouseEventHandler, WheelEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ScreenEditorProps } from "./ScreenEditor";
 
-export default function ScreenEditorEx({ image, imageData, initialPosition, initialScale: scale, onChange }: ScreenEditorProps) {
+export default function ScreenCropperEx({ image, imageData, initialPosition, initialScale: scale, onChange }: ScreenEditorProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [ position, setPosition ] = useState(initialPosition);
@@ -86,7 +86,7 @@ export default function ScreenEditorEx({ image, imageData, initialPosition, init
             <div
             style={{
                 background: "rgba(255, 255, 255, .1)",
-                border: "1px solid white",
+                border: "1px dashed white",
                 width: `${(imageData.width / image.width) / scale * 100}%`,
                 aspectRatio: imageData.width / imageData.height,
                 position: "absolute",

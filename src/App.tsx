@@ -3,6 +3,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { render } from "./functions/Render";
 import ScreenEditor from "./components/ScreenEditor";
 import ScreenEditorEx from "./components/ScreenEditorEx";
+import ScreenCropperEx from "./components/ScreenCropperEx";
 
 export type ChatData = {
   top: string;
@@ -146,110 +147,147 @@ export default function App() {
               }}/>
             </div>
           ):(
-            <div className="modal">
-              <div className="header">
-                <p>Image</p>
+            <div>
+              <div className="modal">
+                <div className="header">
+                  <p>Image Offset</p>
+                </div>
+
+                <div className="content" style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10
+                }}>
+                  {(image) && (
+                    <ScreenEditorEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
+                      setImageData({
+                        ...imageData,
+                        left: position[0],
+                        top: position[1],
+                        scale
+                      })
+                    }}/>
+                  )}
+                </div>
+              </div>
+              
+              <div className="modal">
+                <div className="header">
+                  <p>Image Cropping</p>
+                </div>
+
+                <div className="content" style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10
+                }}>
+                  {(image) && (
+                    <ScreenCropperEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
+                      setImageData({
+                        ...imageData,
+                        left: position[0],
+                        top: position[1],
+                        scale
+                      })
+                    }}/>
+                  )}
+                </div>
               </div>
 
-              <div className="content" style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 10
-              }}>
-                {(image) && (
-                  <ScreenEditorEx image={image} imageData={imageData} initialPosition={[ imageData.left, imageData.top ]} initialScale={imageData.scale} onChange={(position, scale) => {
-                    setImageData({
-                      ...imageData,
-                      left: position[0],
-                      top: position[1],
-                      scale
-                    })
-                  }}/>
-                )}
+              <div className="modal">
+                <div className="header">
+                  <p>Filter</p>
+                </div>
 
-                <div style={{
+                <div className="content" style={{
                   display: "flex",
-                  flexDirection: "row",
-                  gap: 10,
-                  overflowX: "scroll"
+                  flexDirection: "column",
+                  gap: 10
                 }}>
                   <div style={{
-                    flexBasis: 1,
                     display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    background: "rgba(0, 0, 0, .2)"
+                    flexDirection: "row",
+                    gap: 10,
+                    overflowX: "scroll"
                   }}>
-                    <img src={image.src} style={{
-                      aspectRatio: image.width / image.height,
-                      height: 60
-                    }}/>
+                    <div style={{
+                      flexBasis: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "rgba(0, 0, 0, .2)"
+                    }}>
+                      <img src={image.src} style={{
+                        aspectRatio: image.width / image.height,
+                        height: 60
+                      }}/>
 
-                    <small style={{ padding: 5 }}>Normal</small>
-                  </div>
+                      <small style={{ padding: 5 }}>Normal</small>
+                    </div>
 
-                  <div style={{
-                    flexBasis: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    background: "rgba(0, 0, 0, .2)"
-                  }}>
-                    <img src={image.src} style={{
-                      height: 60,
-                      aspectRatio: image.width / image.height,
-                      filter: "grayscale(1)"
-                    }}/>
+                    <div style={{
+                      flexBasis: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "rgba(0, 0, 0, .2)"
+                    }}>
+                      <img src={image.src} style={{
+                        height: 60,
+                        aspectRatio: image.width / image.height,
+                        filter: "grayscale(1)"
+                      }}/>
 
-                    <small style={{ padding: 5 }}>Grayscale</small>
-                  </div>
+                      <small style={{ padding: 5 }}>Grayscale</small>
+                    </div>
 
-                  <div style={{
-                    flexBasis: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    background: "rgba(0, 0, 0, .2)"
-                  }}>
-                    <img src={image.src} style={{
-                      height: 60,
-                      aspectRatio: image.width / image.height,
-                      filter: "sepia(1)"
-                    }}/>
+                    <div style={{
+                      flexBasis: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "rgba(0, 0, 0, .2)"
+                    }}>
+                      <img src={image.src} style={{
+                        height: 60,
+                        aspectRatio: image.width / image.height,
+                        filter: "sepia(1)"
+                      }}/>
 
-                    <small style={{ padding: 5 }}>Sepia</small>
-                  </div>
+                      <small style={{ padding: 5 }}>Sepia</small>
+                    </div>
 
-                  <div style={{
-                    flexBasis: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    background: "rgba(0, 0, 0, .2)"
-                  }}>
-                    <img src={image.src} style={{
-                      height: 60,
-                      aspectRatio: image.width / image.height,
-                      filter: "saturate(2)"
-                    }}/>
+                    <div style={{
+                      flexBasis: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "rgba(0, 0, 0, .2)"
+                    }}>
+                      <img src={image.src} style={{
+                        height: 60,
+                        aspectRatio: image.width / image.height,
+                        filter: "saturate(2)"
+                      }}/>
 
-                    <small style={{ padding: 5 }}>Saturate</small>
-                  </div>
+                      <small style={{ padding: 5 }}>Saturate</small>
+                    </div>
 
-                  <div style={{
-                    flexBasis: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    background: "rgba(0, 0, 0, .2)"
-                  }}>
-                    <img src={image.src} style={{
-                      height: 60,
-                      aspectRatio: image.width / image.height,
-                      filter: "contrast(2)"
-                    }}/>
+                    <div style={{
+                      flexBasis: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "rgba(0, 0, 0, .2)"
+                    }}>
+                      <img src={image.src} style={{
+                        height: 60,
+                        aspectRatio: image.width / image.height,
+                        filter: "contrast(2)"
+                      }}/>
 
-                    <small style={{ padding: 5 }}>Contrast</small>
+                      <small style={{ padding: 5 }}>Contrast</small>
+                    </div>
                   </div>
                 </div>
               </div>
