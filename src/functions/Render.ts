@@ -121,6 +121,13 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 
                 color = "6495ED";
             }
+            else if(line.startsWith("** [") && line.endsWith("**")) {
+                if(!chatData.includeRadio) {
+                    return null;
+                }
+
+                color = "FF8282";
+            }
             else if(line.trim().length === 0) {
             }
             else {
