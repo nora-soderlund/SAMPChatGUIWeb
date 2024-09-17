@@ -149,7 +149,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if(line.includes("You will spawn now with")) {
                 color = "33AA33";
             }
-            else if(line.startsWith("[Drugs] You've taken")) {
+            else if(line.startsWith("[Drugs] You've taken") || line.startsWith("You've taken")) {
                 color = "33AA33";
             }
             else if(line.trim().length === 0) {
