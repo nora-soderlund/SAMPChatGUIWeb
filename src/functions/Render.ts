@@ -146,6 +146,9 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             else if(/^\[\s([0-9]+).\s/.test(line)) {
                 color = "F0F8FF";
             }
+            else if(line.includes("You will spawn now with")) {
+                color = "33AA33";
+            }
             else if(line.trim().length === 0) {
             }
             else {
