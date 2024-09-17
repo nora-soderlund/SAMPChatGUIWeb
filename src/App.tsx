@@ -43,7 +43,7 @@ export default function App() {
     let timeout: number | null = setTimeout(() => {
       timeout = null;
 
-      render(previewRef.current!, image, imageData, cropperData, chatData);
+      render(previewRef.current!, image, imageData, cropperData, chatData, false);
       
       saveLocalStorageData({
         imageData,
@@ -56,7 +56,30 @@ export default function App() {
         clearTimeout(timeout);
       }
     };
-  }, [previewRef.current, image, chatData, cropperData, imageData]);
+  }, [previewRef.current, image, cropperData]);
+
+  useEffect(() => {
+    if(!previewRef.current) {
+      return;
+    }
+
+    let timeout: number | null = setTimeout(() => {
+      timeout = null;
+
+      render(previewRef.current!, image, imageData, cropperData, chatData, true);
+      
+      saveLocalStorageData({
+        imageData,
+        chatData
+      })
+    }, 300);
+
+    return () => {
+      if(timeout !== null) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [previewRef.current, chatData, imageData]);
 
   useEffect(() => {
     if(image) {

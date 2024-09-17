@@ -8,7 +8,7 @@ let abortController: AbortController | undefined;
 
 declare const process: any;
 
-export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, cropperData: CropperData, chatData: ChatData) {
+export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, cropperData: CropperData, chatData: ChatData, renderChat: boolean) {
     if(canvas.width !== imageData.width || canvas.height !== imageData.height) {
         canvas.width = imageData.width;
         canvas.height = imageData.height;
@@ -30,8 +30,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     abortController = new AbortController();
 
     const chatIsUsed = (chatData.top.length || chatData.bottom.length);
-    const chatNeedsRender = (!lastChatImage || lastChatData?.top.length != chatData.top.length || lastChatData?.bottom.length != chatData.bottom.length || lastChatData?.fontSize != chatData.fontSize)
-        || (lastChatData.includeRadio !== chatData.includeRadio) || (lastChatData.includeAutomatedActions !== chatData.includeAutomatedActions);
+    const chatNeedsRender = !lastChatImage || renderChat;
 
     const drawImage = () => {
         const filters: string[] = Object.entries(imageData.options).map(([ key, value ]) => {
