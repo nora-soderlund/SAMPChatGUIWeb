@@ -2,7 +2,6 @@ import { CropperData } from "../components/ImageCropper";
 import { ChatData } from "../interfaces/ChatData";
 import { ImageData } from "../interfaces/ImageData";
 
-let lastChatData: ChatData | null = null;
 let lastChatImages: [HTMLImageElement | null, HTMLImageElement | null] | null = null;
 let abortController: AbortController | undefined;
 
@@ -14,7 +13,6 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         canvas.height = imageData.height;
 
         lastChatImages = null;
-        lastChatData = null;
     }
 
     const context = canvas.getContext("2d");
@@ -236,9 +234,6 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             (topImage.status === "fulfilled")?(topImage.value):(null),
             (bottomImage.status === "fulfilled")?(bottomImage.value):(null)
         ];
-        lastChatData = {
-            ...chatData
-        };
     }
     
     context.clearRect(0, 0, canvas.width, canvas.height);
