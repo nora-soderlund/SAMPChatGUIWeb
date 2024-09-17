@@ -250,7 +250,7 @@ export default function App() {
           <div className="modal">
             <div className="header">
               <p>Resolution</p>
-              <p><small>How big your result image should be, default is 800x600.</small></p>
+              <p><small>How big your result image should be, default is 800 by 600.</small></p>
             </div>
             
             <div className="content" style={{
@@ -289,7 +289,7 @@ export default function App() {
           <div className="modal">
             <div className="header">
               <p>Offsets</p>
-              <p><small>How far away the text should be from the edges, default is 30x10 in SAMP.</small></p>
+              <p><small>How far away the text should be from the edges, default is 30 by 10 in SAMP.</small></p>
             </div>
             
             <div className="content" style={{
