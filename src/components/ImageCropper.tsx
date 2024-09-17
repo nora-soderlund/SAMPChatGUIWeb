@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Cropper from "cropperjs";
-import { ImageData } from "../App";
+import { ImageData } from "../interfaces/ImageData";
 
 export type CropperData = {
     x: number;
@@ -31,8 +31,18 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
 
         cropper.setData(cropperData);
     }, [cropper, cropperData]);
+    
+    useEffect(() => {
+        if(!cropper) {
+            return;
+        }
+
+        cropper.setAspectRatio(imageData.width / imageData.height);
+        onChange(cropper.getData());
+    }, [imageData.width, imageData.height]);
 
     useEffect(() => {
+        cropper?.reset();
         cropper?.destroy();
 
         if(containerRef.current) {
@@ -41,6 +51,8 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
                 
                 ready() {
                     setCropper(cropper);
+                
+                    cropper.setData(cropperData);
                 },
                 cropstart() {
                     setCropActive(true);

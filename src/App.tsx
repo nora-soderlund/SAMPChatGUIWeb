@@ -2,97 +2,10 @@ import { ChangeEvent, DragEvent, useCallback, useEffect, useRef, useState } from
 
 import { render } from "./functions/Render";
 import ImageCropper, { CropperData } from "./components/ImageCropper";
-
-export type ChatData = {
-  top: string;
-  bottom: string;
-
-  fontSize: number;
-
-  offset: {
-    left: number;
-    top: number;
-  };
-
-  characterName: string;
-  includeRadio: boolean;
-  includeAutomatedActions: boolean;
-  includeBroadcasts: boolean;
-};
-
-type ImageDataOption = {
-  enabled: boolean;
-  value: number;
-  maxValue: number;
-};
-
-export type ImageData = {
-  width: number;
-  height: number;
-
-  options: {
-    brightness: ImageDataOption;
-    grayscale: ImageDataOption;
-    sepia: ImageDataOption;
-    saturate: ImageDataOption;
-    contrast: ImageDataOption;
-  };
-};
-
-const defaultImageData: ImageData = {
-  width: 800,
-  height: 600,
-
-  options: {
-    brightness: {
-      enabled: false,
-      value: 1,
-      maxValue: 2
-    },
-    
-    grayscale: {
-      enabled: false,
-      value: 1,
-      maxValue: 2
-    },
-
-    sepia: {
-      enabled: false,
-      value: 1,
-      maxValue: 1
-    },
-
-    saturate: {
-      enabled: false,
-      value: 2,
-      maxValue: 4
-    },
-
-    contrast: {
-      enabled: false,
-      value: 1.5,
-      maxValue: 3
-    }
-  }
-};
-
-const defaultChatData: ChatData = {
-  top: "* Ray Maverick waves.",
-  bottom: "",
-
-  fontSize: 18,
-
-  offset: {
-    left: 30,
-    top: 10
-  },
-
-  characterName: "",
-
-  includeRadio: true,
-  includeAutomatedActions: false,
-  includeBroadcasts: false
-};
+import { loadLocalStorageData, saveLocalStorageData } from "./functions/LocalStorage";
+import { ImageData, defaultImageData } from "./interfaces/ImageData";
+import { ChatData, defaultChatData } from "./interfaces/ChatData";
+import Option from "./components/Option";
 
 const defaultCropperData: CropperData = {
   x: 0,
@@ -102,96 +15,6 @@ const defaultCropperData: CropperData = {
   scaleX: 1,
   scaleY: 1
 };
-
-
-type OptionProps = {
-  text: string;
-  option: keyof ImageData["options"];
-  image: HTMLImageElement;
-  imageData: ImageData;
-  setImageData: (value: ImageData) => void;
-};
-
-function Option({ text, option, image, imageData, setImageData }: OptionProps) {
-  return (
-    <div style={{
-      flexBasis: 1,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      background: "rgba(0, 0, 0, .2)",
-      opacity: (imageData.options[option].enabled)?(1):(0.5),
-      position: "relative"
-    }}>
-      <img src={image!.src} style={{
-        width: "100%",
-        aspectRatio: image!.width / image!.height,
-        filter: `${option}(${defaultImageData.options[option].value})`
-      }}/>
-
-      <small style={{ padding: 5 }}>{text}</small>
-
-      {(imageData.options[option].enabled)?(
-        <div style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: "100%",
-          background: "rgba(0, 0, 0, .2)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
-        }}>
-          <input type="range" min={0} max={imageData.options[option].maxValue} value={imageData.options[option].value} step={0.01} onChange={(event) =>  setImageData({
-            ...imageData,
-            options: {
-              ...imageData.options,
-              [option]: {
-                ...imageData.options[option],
-                value: parseFloat(event.target.value)
-              }
-            }
-          })}/>
-
-          <p style={{
-            cursor: "pointer"
-          }} onClick={() => setImageData({
-            ...imageData,
-            options: {
-              ...imageData.options,
-              [option]: {
-                ...imageData.options[option],
-                enabled: false
-              }
-            }
-          })}>
-            Remove
-          </p>
-        </div>
-      ):(
-        <div style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: "100%",
-          cursor: "pointer"
-        }} onClick={() => setImageData({
-          ...imageData,
-          options: {
-            ...imageData.options,
-            [option]: {
-              ...imageData.options[option],
-              enabled: true
-            }
-          }
-        })}/>
-      )}
-    </div>
-  );
-}
 
 export default function App() {
   const imageRef = useRef<HTMLInputElement>(null);
@@ -203,25 +26,13 @@ export default function App() {
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
   const [cropperData, setCropperData] = useState<CropperData>(defaultCropperData);
 
-  /*useEffect(() => {
-    if(!canvasRef.current) {
-      return;
-    }
-
-    render(canvasRef.current!, image, imageData, chat);
-  }, [canvasRef.current, chat, image, imageData]);*/
-
   useEffect(() => {
-    const rawData = localStorage.getItem("options");
+    const localStorageData = loadLocalStorageData();
 
-    if(!rawData) {
-      return;
+    if(localStorageData) {
+      setImageData(localStorageData.imageData);
+      setChatData(localStorageData.chatData);
     }
-
-    const parsedData = JSON.parse(rawData);
-
-    setImageData(parsedData.imageData);
-    setChatData(parsedData.chatData);
   }, []);
 
   useEffect(() => {
@@ -234,10 +45,10 @@ export default function App() {
 
       render(previewRef.current!, image, imageData, cropperData, chatData);
       
-      localStorage.setItem("options", JSON.stringify({
+      saveLocalStorageData({
         imageData,
         chatData
-      }));
+      })
     }, 300);
 
     return () => {
@@ -556,7 +367,7 @@ export default function App() {
                   includeBroadcasts: !chatData.includeBroadcasts
                 })}/>
 
-                <label htmlFor="includeBroadcasts">Include broadcasts (ads, news)</label>
+                <label htmlFor="includeBroadcasts">Include broadcasts (ads, news, government)</label>
               </fieldset>
             </div>
           </div>
@@ -564,7 +375,8 @@ export default function App() {
 
         <div className="modal" style={{
           flex: 1,
-          margin: 10
+          margin: 10,
+          position: "relative"
         }}>
           <div className="content" style={{
             display: "flex",
@@ -616,19 +428,21 @@ export default function App() {
                 </div>
               )}
             </div>
+          </div>
 
-            <div style={{
-              width: "90%"
+          <div style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0
+          }}>
+            <p style={{
+              maxWidth: 600,
+              marginRight: "auto"
             }}>
-              <p style={{
-                maxWidth: 600,
-                marginRight: "auto"
-              }}>
-                <small>
-                  This application is provided to the community of LS-RP since the previously used tool was abruptly brought down by its creator. This tool was put together on short notice and is continuously being worked on.
-                </small>
-              </p>
-            </div>
+              <small>
+                This application is provided to the community of LS-RP since the previously used tool was abruptly brought down by its creator. This tool was put together on short notice and is continuously being worked on.
+              </small>
+            </p>
           </div>
         </div>
 

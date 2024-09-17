@@ -1,5 +1,6 @@
-import { ChatData, ImageData } from "../App";
 import { CropperData } from "../components/ImageCropper";
+import { ChatData } from "../interfaces/ChatData";
+import { ImageData } from "../interfaces/ImageData";
 
 let lastChatData: ChatData | null = null;
 let lastChatImage: HTMLImageElement | null = null;
@@ -159,14 +160,15 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             }
         }
 
-        const response = await fetch("https://gui.sampscreens.com", {
+        const response = await fetch((window.location.hostname === "localhost")?("http://localhost:8080"):("https://gui.sampscreens.com"), {
         //const response = await fetch("http://localhost:8080", {
             method: "POST",
             signal: abortController.signal,
             body: JSON.stringify({
                 offset: chatData.offset,
-
                 fontSize: chatData.fontSize,
+                width: Math.min(imageData.width, 3840),
+                height: Math.min(imageData.height, 2160),
 
                 top: chatData.top.split('\n').map(handleLine).filter(Boolean),
                 bottom: chatData.bottom.split('\n').map(handleLine).filter(Boolean)
