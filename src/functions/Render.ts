@@ -89,6 +89,14 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                     color = "C8C8C8";
                 }
             }
+            else if (line.includes(" says (phone): ") || line.includes(" says (phone - low): ") || /([A-Za-z]+\s[A-Za-z]+)\s+says(.*)\\((phone|phone - low)\\)(.*?):\s+(.*)/.test(line)) {
+                if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
+                    color = "FFFFFF";
+                }
+                else {
+                    color = "FFFF00";
+                }
+            }
             else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)|| /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)(.*):\s+(.*)/.test(line)) {
                 if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
                     color = "FFFFFF";
