@@ -53,7 +53,8 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
                     
                     onChange(cropper.getData());
                 },
-                cropstart() {
+                zoom() {
+                    onChange(cropper.getData());
                 },
                 cropend() {
                     onChange(cropper.getData());
