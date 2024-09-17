@@ -63,7 +63,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 }
             }
             else if (line.includes(" says: ") || /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)\s+to\s+([A-Za-z]+\s[A-Za-z]+):\s+(.*)/.test(line)|| /([A-Za-z]+\s[A-Za-z]+)\s+(says|shouts|screams)(.*):\s+(.*)/.test(line)) {
-                if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
+                if(line.includes("[MIC]")) {
+                    color = "9DFF96";
+                }
+                else if(chatData.characterName && (line.toLowerCase().startsWith(chatData.characterName.toLowerCase()) || line.toLowerCase().startsWith(chatData.characterName.toLowerCase().replace('_', ' ')))) {
                     color = "FFFFFF";
                 }
                 else {
