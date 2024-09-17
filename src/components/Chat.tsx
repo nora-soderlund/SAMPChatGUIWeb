@@ -1,0 +1,75 @@
+import { Fragment } from "react/jsx-runtime";
+import { ChatSectionData } from "../interfaces/ChatData";
+
+export type ChatProps = {
+    id: string;
+    title: string;
+    chatSection: ChatSectionData;
+    onChange: (chatSection: ChatSectionData) => void;
+};
+
+export default function Chat({ id, title, chatSection, onChange }: ChatProps) {
+    return (
+        <Fragment>
+            <div className="modal">
+            <div className="header">
+                <p>{title}</p>
+            </div>
+            
+            <div className="content">
+                <textarea value={chatSection.text} onChange={(event) =>
+                    onChange({
+                    ...chatSection,
+                    text: event.target.value
+                    })}
+                    style={{
+                    width: "100%",
+                    height: 160,
+                    background: "none",
+                    resize: "none",
+                    margin: 0,
+                    color: "#FFF"
+                    }}/>
+            </div>
+        </div>
+            
+          <div className="modal">
+            <div className="header">
+              <p>Background color</p>
+              <p><small>If you want the chat to be put on a background, enter the color here.</small></p>
+            </div>
+            
+            <div className="content">
+                
+                <div style={{
+                    display: "flex",
+                    flexDirection: "row"
+                }}>
+                <fieldset>
+                    <input id={`${id}-useBackground`} type="checkbox" checked={chatSection.useBackground} onChange={() => onChange({
+                    ...chatSection,
+                    useBackground: !chatSection.useBackground
+                    })}/>
+
+                    <label htmlFor={`${id}-useBackground`}>Use background</label>
+                </fieldset>
+
+                <input disabled={!chatSection.useBackground} type="text" placeholder="transparent" value={chatSection.background} style={{ flex: 1 }} onChange={(event) => onChange({
+                    ...chatSection,
+                    background: event.target.value
+                })}/>
+                </div>
+                
+              <fieldset>
+                <input id={`${id}-outside`} type="checkbox" checked={chatSection.outside} onChange={() => onChange({
+                  ...chatSection,
+                  outside: !chatSection.outside
+                })}/>
+
+                <label htmlFor={`${id}-outside`}>Put text outside of the image</label>
+              </fieldset>
+            </div>
+          </div>
+        </Fragment>
+    );
+}

@@ -17,15 +17,25 @@ export type ChatData = {
 
 export type ChatSectionData = {
     text: string;
+
+    useBackground: boolean;
+    background: string;
+    outside: boolean;
 };
 
 export const defaultChatData: ChatData = {
     top: {
-        text: "* Ray Maverick waves."
+        text: "* Ray Maverick waves.",
+        background: "black",
+        useBackground: false,
+        outside: false
     },
-    
+
     bottom: {
-        text: ""
+        text: "",
+        background: "black",
+        useBackground: false,
+        outside: false
     },
   
     fontSize: 18,

@@ -6,6 +6,7 @@ import { loadLocalStorageData, saveLocalStorageData } from "./functions/LocalSto
 import { ImageData, defaultImageData } from "./interfaces/ImageData";
 import { ChatData, defaultChatData } from "./interfaces/ChatData";
 import Option from "./components/Option";
+import Chat from "./components/Chat";
 
 const defaultCropperData: CropperData = {
   x: 0,
@@ -213,55 +214,17 @@ export default function App() {
             }}/>
           </div>
 
-          <div className="modal">
-            <div className="header">
-              <p>Top chat</p>
-            </div>
-            
-            <div className="content">
-              <textarea value={chatData.top.text} onChange={(event) =>
-                setChatData({
-                  ...chatData,
-                  top: {
-                    ...chatData.top,
-                    text: event.target.value
-                  }
-                })}
-                style={{
-                  width: "100%",
-                  height: 160,
-                  background: "none",
-                  resize: "none",
-                  margin: 0,
-                  color: "#FFF"
-                }}/>
-            </div>
-          </div>
+          <Chat id="top" title="Top chat" chatSection={chatData.top} onChange={(chatSection) =>
+            setChatData({
+              ...chatData,
+              top: chatSection
+            })}/>
 
-          <div className="modal">
-            <div className="header">
-              <p>Bottom chat</p>
-            </div>
-            
-            <div className="content">
-              <textarea value={chatData.bottom.text} onChange={(event) =>
-                setChatData({
-                  ...chatData,
-                  bottom: {
-                    ...chatData.bottom,
-                    text: event.target.value
-                  }
-                })}
-                style={{
-                  width: "100%",
-                  height: 160,
-                  background: "none",
-                  resize: "none",
-                  margin: 0,
-                  color: "#FFF"
-                }}/>
-            </div>
-          </div>
+          <Chat id="bottom" title="Bottom chat" chatSection={chatData.bottom} onChange={(chatSection) =>
+            setChatData({
+              ...chatData,
+              bottom: chatSection
+            })}/>
 
           <div className="modal">
             <div className="header">

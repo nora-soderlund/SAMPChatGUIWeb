@@ -78,6 +78,12 @@ textarea:focus, input[type=text]:focus, input[type=number]:focus {
     /*border-color: rgba(255, 255, 255, .5);*/
 }
 
+
+
+textarea:disabled, input[type=text]:disabled, input[type=number]:disabled {
+    opacity: .3;
+}
+
 button {
     background: #1b4cb5;
     border-width: 0;

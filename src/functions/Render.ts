@@ -8,19 +8,6 @@ let abortController: AbortController | undefined;
 declare const process: any;
 
 export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement | null, imageData: ImageData, cropperData: CropperData, chatData: ChatData, renderChat: boolean) {
-    if(canvas.width !== imageData.width || canvas.height !== imageData.height) {
-        canvas.width = imageData.width;
-        canvas.height = imageData.height;
-
-        lastChatImages = null;
-    }
-
-    const context = canvas.getContext("2d");
-
-    if(!context) {
-        throw Error("No context");
-    }
-
     if(abortController) {
         abortController.abort("New render started.");
     }
@@ -29,26 +16,6 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
     const chatIsUsed = (chatData.top.text.length || chatData.bottom.text.length);
     const chatNeedsRender = !lastChatImages || renderChat;
-
-    const drawImage = () => {
-        const filters: string[] = Object.entries(imageData.options).map(([ key, value ]) => {
-            if(!value.enabled) {
-                return "";
-            }
-
-            return `${key}(${value.value})`;
-        });
-
-        context.save();
-
-        context.filter = filters.filter(Boolean).join(' ');
-
-        context.drawImage(image!,
-            cropperData.x, cropperData.y, cropperData.width * cropperData.scaleX, cropperData.height * cropperData.scaleY,
-            0, 0, canvas.width, canvas.height);
-
-        context.restore();
-    }
 
     if(chatIsUsed && chatNeedsRender) {
         function handleLine(line: string) {
@@ -183,8 +150,6 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
         abortController = undefined;
 
-        context.save();
-    
         const urlCreator = window.URL || window.webkitURL;
         const result = await response.blob();
 
@@ -235,6 +200,45 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
             (bottomImage.status === "fulfilled")?(bottomImage.value):(null)
         ];
     }
+
+    const offsetTop = (lastChatImages && lastChatImages[0] && chatData.top.outside && chatData.top.text.length)?(lastChatImages[0].height):(0);
+    const offsetForBottomChat = offsetTop + imageData.height;
+    const totalHeight = offsetForBottomChat + ((lastChatImages && lastChatImages[1] && chatData.bottom.outside && chatData.bottom.text.length)?(lastChatImages[1].height):(0));
+
+    canvas.width = imageData.width;
+    canvas.height = totalHeight;
+
+    if(canvas.parentElement) { // well... duh
+        canvas.parentElement.style.height = `${canvas.height}px`;
+    }
+
+    const context = canvas.getContext("2d");
+
+    if(!context) {
+        throw Error("No context");
+    }
+
+    context.save();
+
+    const drawImage = () => {
+        const filters: string[] = Object.entries(imageData.options).map(([ key, value ]) => {
+            if(!value.enabled) {
+                return "";
+            }
+
+            return `${key}(${value.value})`;
+        });
+
+        context.save();
+
+        context.filter = filters.filter(Boolean).join(' ');
+
+        context.drawImage(image!,
+            cropperData.x, cropperData.y, cropperData.width * cropperData.scaleX, cropperData.height * cropperData.scaleY,
+            0, offsetTop, imageData.width, imageData.height);
+
+        context.restore();
+    }
     
     context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -245,14 +249,30 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     if(lastChatImages) {
         console.log(lastChatImages);
 
-        if(lastChatImages[0]) {
-            context.drawImage(lastChatImages[0], 0, 0, lastChatImages[0].width, lastChatImages[0].height, 0, 0, lastChatImages[0].width, lastChatImages[0].height);
+        const [ topImage, bottomImage ] = lastChatImages;
+
+        if(topImage && chatData.top.text.length) {
+            if(chatData.top.useBackground) {
+                context.fillStyle = chatData.top.background;
+
+                context.fillRect(0, 0, topImage.width, topImage.height);
+            }
+
+            context.drawImage(topImage, 0, 0, topImage.width, topImage.height, 0, 0, topImage.width, topImage.height);
         }
         
-        if(lastChatImages[1]) {
-            context.drawImage(lastChatImages[1],
-                0, 0, lastChatImages[1].width, lastChatImages[1].height,
-                0, imageData.height - lastChatImages[1].height, lastChatImages[1].width, lastChatImages[1].height
+        if(bottomImage && chatData.bottom.text.length) {
+            const top = totalHeight - bottomImage.height;
+
+            if(chatData.bottom.useBackground) {
+                context.fillStyle = chatData.bottom.background;
+
+                context.fillRect(0, top, bottomImage.width, bottomImage.height);
+            }
+
+            context.drawImage(bottomImage,
+                0, 0, bottomImage.width, bottomImage.height,
+                0, top, bottomImage.width, bottomImage.height
             );
         }
     }
