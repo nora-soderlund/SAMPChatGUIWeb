@@ -150,7 +150,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 color = "33AA33";
             }
             else if(line.startsWith("[Drugs] You've taken") || line.startsWith("You've taken")) {
-                color = "33AA33";
+                color = "FFFF00";
             }
             else if(line.trim().length === 0) {
             }
