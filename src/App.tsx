@@ -449,7 +449,7 @@ export default function App() {
         
         <div style={{
           overflowY: "scroll",
-          width: "25vw",
+          flex: 1,
           padding: 10,
           boxSizing: "border-box",
           direction: "rtl"
@@ -465,10 +465,14 @@ export default function App() {
               <p>Preview</p>
             </div>
 
-            <div className="content">
+            <div className="content" style={{
+              display: "flex",
+              justifyContent: "center",
+            }}>
               <div style={{
                 background: "rgba(0, 0, 0, .1)",
                 width: "100%",
+                maxWidth: imageData.width,
                 aspectRatio: imageData.width / imageData.height,
                 overflow: "hidden",
                 position: "relative"
@@ -485,82 +489,80 @@ export default function App() {
           </div>
 
           {(image) && (
-            <>
-
-              <div className="modal">
-                <div className="header">
-                  <p>Filter</p>
-                </div>
-
-                <div className="content" style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10
-                }}>
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 10,
-                  }}>
-                    <Option image={image} imageData={imageData} setImageData={setImageData} text="Brightness" option="brightness"/>
-                    <Option image={image} imageData={imageData} setImageData={setImageData} text="Grayscale" option="grayscale"/>
-                    <Option image={image} imageData={imageData} setImageData={setImageData} text="Sepia" option="sepia"/>
-                    <Option image={image} imageData={imageData} setImageData={setImageData} text="Saturate" option="saturate"/>
-                    <Option image={image} imageData={imageData} setImageData={setImageData} text="Contrast" option="contrast"/>
-                  </div>
-                </div>
+            <div className="modal">
+              <div className="header">
+                <p>Filter</p>
               </div>
 
-              <div style={{
+              <div className="content" style={{
                 display: "flex",
-                flexDirection: "row",
-                gap: 10,
-                justifyContent: "flex-end"
+                flexDirection: "column",
+                gap: 10
               }}>
-                <button style={{ width: 160 }} onClick={() => {
-                  if(!previewRef.current) {
-                    return;
-                  }
-
-                  try {
-                    previewRef.current.toBlob(blob => blob && navigator.clipboard.write([
-                      new ClipboardItem({
-                        'image/png': blob
-                      })
-                    ]));
-
-                    alert("Copied to your clipboard.");
-                  }
-                  catch(error) {
-                    console.error(error);
-
-                    alert("Failed to copy to the clipboard.");
-                  }
+                <div style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 10,
                 }}>
-                  Copy to clipboard
-                </button>
-
-                <button className="secondary" style={{ width: 160 }} onClick={() => {
-                  if(!previewRef.current) {
-                    return;
-                  }
-                  
-                  const downloadLink = document.createElement('a');
-                  downloadLink.setAttribute('download', `Screenshot ${new Date().toISOString()}.png`);
-
-                  previewRef.current.toBlob(blob => {
-                    if(blob) {
-                      const url = URL.createObjectURL(blob);
-                      downloadLink.setAttribute('href', url);
-                      downloadLink.click();
-                    }
-                });
-                }}>
-                  Save to disk
-                </button>
+                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Brightness" option="brightness"/>
+                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Grayscale" option="grayscale"/>
+                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Sepia" option="sepia"/>
+                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Saturate" option="saturate"/>
+                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Contrast" option="contrast"/>
+                </div>
               </div>
-            </>
+            </div>
           )}
+
+            <div style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 10,
+              justifyContent: "flex-end"
+            }}>
+              <button style={{ width: 160 }} onClick={() => {
+                if(!previewRef.current) {
+                  return;
+                }
+
+                try {
+                  previewRef.current.toBlob(blob => blob && navigator.clipboard.write([
+                    new ClipboardItem({
+                      'image/png': blob
+                    })
+                  ]));
+
+                  alert("Copied to your clipboard.");
+                }
+                catch(error) {
+                  console.error(error);
+
+                  alert("Failed to copy to the clipboard.");
+                }
+              }}>
+                Copy to clipboard
+              </button>
+
+              <button className="secondary" style={{ width: 160 }} onClick={() => {
+                if(!previewRef.current) {
+                  return;
+                }
+                
+                const downloadLink = document.createElement('a');
+                downloadLink.setAttribute('download', `Screenshot ${new Date().toISOString()}.png`);
+
+                previewRef.current.toBlob(blob => {
+                  if(blob) {
+                    const url = URL.createObjectURL(blob);
+                    downloadLink.setAttribute('href', url);
+                    downloadLink.click();
+                  }
+              });
+              }}>
+                Save to disk
+              </button>
+            </div>
           </div>
         </div>
       </div>

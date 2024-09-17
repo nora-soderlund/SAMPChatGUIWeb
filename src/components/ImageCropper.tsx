@@ -25,12 +25,12 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
     const [cropActive, setCropActive] = useState(false);
 
     useEffect(() => {
-        if(!cropper || cropActive) {
+        if(!cropper) {
             return;
         }
 
         cropper.setData(cropperData);
-    }, [cropper, cropperData]);
+    }, [cropperData]);
     
     useEffect(() => {
         if(!cropper) {
@@ -51,8 +51,8 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
                 
                 ready() {
                     setCropper(cropper);
-                
-                    cropper.setData(cropperData);
+                    
+                    onChange(cropper.getData());
                 },
                 cropstart() {
                     setCropActive(true);

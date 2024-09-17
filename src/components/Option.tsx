@@ -11,7 +11,8 @@ export type OptionProps = {
 export default function Option({ text, option, image, imageData, setImageData }: OptionProps) {
     return (
       <div style={{
-        flexBasis: 1,
+        width: 400,
+        maxWidth: "40%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
