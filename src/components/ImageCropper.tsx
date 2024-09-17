@@ -22,7 +22,6 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
     const containerRef = useRef<HTMLImageElement>(null);
     
     const [cropper, setCropper] = useState<Cropper | null>(null);
-    const [cropActive, setCropActive] = useState(false);
 
     useEffect(() => {
         if(!cropper) {
@@ -55,12 +54,9 @@ export default function ImageCropper({ image, imageData, cropperData, onChange }
                     onChange(cropper.getData());
                 },
                 cropstart() {
-                    setCropActive(true);
                 },
                 cropend() {
                     onChange(cropper.getData());
-                    
-                    setCropActive(false);
                 }
             });
         }
