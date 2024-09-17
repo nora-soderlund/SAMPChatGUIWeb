@@ -30,16 +30,8 @@ export default function Chat({ id, title, chatSection, onChange }: ChatProps) {
                     margin: 0,
                     color: "#FFF"
                     }}/>
-            </div>
-        </div>
-            
-          <div className="modal">
-            <div className="header">
-              <p>Background color</p>
-              <p><small>If you want the chat to be put on a background, enter the color here.</small></p>
-            </div>
-            
-            <div className="content">
+
+            <p style={{ padding: "0 10px", margin: "5px 0" }}><small>If you want the chat to be put on a background, enter the color here.</small></p>
                 
                 <div style={{
                     display: "flex",

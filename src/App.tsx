@@ -214,17 +214,60 @@ export default function App() {
             }}/>
           </div>
 
+          <hr/>
+
           <Chat id="top" title="Top chat" chatSection={chatData.top} onChange={(chatSection) =>
             setChatData({
               ...chatData,
               top: chatSection
             })}/>
 
+          <hr/>
+
           <Chat id="bottom" title="Bottom chat" chatSection={chatData.bottom} onChange={(chatSection) =>
             setChatData({
               ...chatData,
               bottom: chatSection
             })}/>
+
+          <hr/>
+
+          <div className="modal">
+            <div className="header">
+              <p>Filtering</p>
+            </div>
+            
+            <div className="content">
+              <fieldset>
+                <input id="includeRadio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
+                  ...chatData,
+                  includeRadio: !chatData.includeRadio
+                })}/>
+
+                <label htmlFor="includeRadio">Include radio</label>
+              </fieldset>
+              
+              <fieldset>
+                <input id="includeAutomatedActions" type="checkbox" checked={chatData.includeAutomatedActions} onChange={() => setChatData({
+                  ...chatData,
+                  includeAutomatedActions: !chatData.includeAutomatedActions
+                })}/>
+
+                <label htmlFor="includeAutomatedActions">Include automated actions</label>
+              </fieldset>
+              
+              <fieldset>
+                <input id="includeBroadcasts" type="checkbox" checked={chatData.includeBroadcasts} onChange={() => setChatData({
+                  ...chatData,
+                  includeBroadcasts: !chatData.includeBroadcasts
+                })}/>
+
+                <label htmlFor="includeBroadcasts">Include broadcasts (ads, news, government)</label>
+              </fieldset>
+            </div>
+          </div>
+
+          <hr/>
 
           <div className="modal">
             <div className="header">
@@ -336,41 +379,6 @@ export default function App() {
                 characterName: event.target.value
               })}/>
 
-            </div>
-          </div>
-
-          <div className="modal">
-            <div className="header">
-              <p>Filtering</p>
-            </div>
-            
-            <div className="content">
-              <fieldset>
-                <input id="includeRadio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
-                  ...chatData,
-                  includeRadio: !chatData.includeRadio
-                })}/>
-
-                <label htmlFor="includeRadio">Include radio</label>
-              </fieldset>
-              
-              <fieldset>
-                <input id="includeAutomatedActions" type="checkbox" checked={chatData.includeAutomatedActions} onChange={() => setChatData({
-                  ...chatData,
-                  includeAutomatedActions: !chatData.includeAutomatedActions
-                })}/>
-
-                <label htmlFor="includeAutomatedActions">Include automated actions</label>
-              </fieldset>
-              
-              <fieldset>
-                <input id="includeBroadcasts" type="checkbox" checked={chatData.includeBroadcasts} onChange={() => setChatData({
-                  ...chatData,
-                  includeBroadcasts: !chatData.includeBroadcasts
-                })}/>
-
-                <label htmlFor="includeBroadcasts">Include broadcasts (ads, news, government)</label>
-              </fieldset>
             </div>
           </div>
         </div>

@@ -97,3 +97,16 @@ button {
 fieldset {
     border: none;
 }
+
+hr {
+    width: 100%;
+    height: 2px;
+
+    background: none;
+
+    border: none;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+
+    outline: none;
+    box-sizing: border-box;
+}
