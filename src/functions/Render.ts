@@ -131,6 +131,12 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
                 color = "FF8282";
             }
+            else if(line === "_______Vehicle Weapon Package:_______") {
+                color = "33AA33";
+            }
+            else if(/^\[\s([0-9]+).\s/.test(line)) {
+                color = "F0F8FF";
+            }
             else if(line.trim().length === 0) {
             }
             else {
