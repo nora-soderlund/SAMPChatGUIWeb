@@ -10,63 +10,70 @@ export type LocalStorageData = {
 export const currentLocalStorageVersion = 3; 
 
 export function loadLocalStorageData() {
-    const rawData = localStorage.getItem("options");
+    try {
+        const rawData = localStorage.getItem("options");
 
-    if(!rawData) {
-      return null;
-    }
-
-    const localStorageData: LocalStorageData = JSON.parse(rawData);
-
-    // advance from no version to version 1
-    if(localStorageData.version === undefined) {
-        localStorageData.version = 1;
-
-        // update the default chat offset
-        if(localStorageData.chatData.offset.left === 30 && localStorageData.chatData.offset.top === 10) {
-            localStorageData.chatData.offset = {
-                ...defaultChatData.offset
-            };
+        if(!rawData) {
+        return null;
         }
 
-        saveLocalStorageData(localStorageData);
-    }
-    
-    if(localStorageData.version === 1) {
-        localStorageData.version = 2;
-        
-        localStorageData.chatData.top = {
-            text: localStorageData.chatData.top as unknown as string
-        } as any;
-        
-        localStorageData.chatData.bottom = {
-            text: localStorageData.chatData.bottom as unknown as string
-        } as any;
+        const localStorageData: LocalStorageData = JSON.parse(rawData);
 
-        saveLocalStorageData(localStorageData);
-    }
-    
-    if(localStorageData.version === 2) {
-        localStorageData.version = 3;
-        
-        localStorageData.chatData.top = {
-            text: localStorageData.chatData.top.text,
-            background: "black",
-            useBackground: false,
-            outside: false
-        };
-        
-        localStorageData.chatData.bottom = {
-            text: localStorageData.chatData.bottom.text,
-            background: "black",
-            useBackground: false,
-            outside: false
-        };
+        // advance from no version to version 1
+        if(localStorageData.version === undefined) {
+            localStorageData.version = 1;
 
-        saveLocalStorageData(localStorageData);
-    }
+            // update the default chat offset
+            if(localStorageData.chatData.offset.left === 30 && localStorageData.chatData.offset.top === 10) {
+                localStorageData.chatData.offset = {
+                    ...defaultChatData.offset
+                };
+            }
 
-    return localStorageData;
+            saveLocalStorageData(localStorageData);
+        }
+        
+        if(localStorageData.version === 1) {
+            localStorageData.version = 2;
+            
+            localStorageData.chatData.top = {
+                text: localStorageData.chatData.top as unknown as string
+            } as any;
+            
+            localStorageData.chatData.bottom = {
+                text: localStorageData.chatData.bottom as unknown as string
+            } as any;
+
+            saveLocalStorageData(localStorageData);
+        }
+        
+        if(localStorageData.version === 2) {
+            localStorageData.version = 3;
+            
+            localStorageData.chatData.top = {
+                text: localStorageData.chatData.top.text,
+                background: "black",
+                useBackground: false,
+                outside: false
+            };
+            
+            localStorageData.chatData.bottom = {
+                text: localStorageData.chatData.bottom.text,
+                background: "black",
+                useBackground: false,
+                outside: false
+            };
+
+            saveLocalStorageData(localStorageData);
+        }
+
+        return localStorageData;
+    }
+    catch(error) {
+        console.error(error);
+        
+        return null;
+    }
 }
 
 export function saveLocalStorageData(localStorageData: Omit<LocalStorageData, "version">) {
