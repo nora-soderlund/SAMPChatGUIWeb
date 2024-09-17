@@ -219,14 +219,22 @@ export default function App() {
             </div>
             
             <div className="content">
-              <textarea value={chatData.top} onChange={(event) => setChatData({ ...chatData, top: event.target.value })} style={{
-                width: "100%",
-                height: 160,
-                background: "none",
-                resize: "none",
-                margin: 0,
-                color: "#FFF"
-              }}/>
+              <textarea value={chatData.top.text} onChange={(event) =>
+                setChatData({
+                  ...chatData,
+                  top: {
+                    ...chatData.top,
+                    text: event.target.value
+                  }
+                })}
+                style={{
+                  width: "100%",
+                  height: 160,
+                  background: "none",
+                  resize: "none",
+                  margin: 0,
+                  color: "#FFF"
+                }}/>
             </div>
           </div>
 
@@ -236,14 +244,22 @@ export default function App() {
             </div>
             
             <div className="content">
-              <textarea value={chatData.bottom} onChange={(event) => setChatData({ ...chatData, bottom: event.target.value })} style={{
-                width: "100%",
-                height: 160,
-                background: "none",
-                resize: "none",
-                margin: 0,
-                color: "#FFF"
-              }}/>
+              <textarea value={chatData.bottom.text} onChange={(event) =>
+                setChatData({
+                  ...chatData,
+                  bottom: {
+                    ...chatData.bottom,
+                    text: event.target.value
+                  }
+                })}
+                style={{
+                  width: "100%",
+                  height: 160,
+                  background: "none",
+                  resize: "none",
+                  margin: 0,
+                  color: "#FFF"
+                }}/>
             </div>
           </div>
 

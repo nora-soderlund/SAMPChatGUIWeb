@@ -3,7 +3,7 @@ import { ChatData } from "../interfaces/ChatData";
 import { ImageData } from "../interfaces/ImageData";
 
 let lastChatData: ChatData | null = null;
-let lastChatImage: HTMLImageElement | null = null;
+let lastChatImages: [HTMLImageElement | null, HTMLImageElement | null] | null = null;
 let abortController: AbortController | undefined;
 
 declare const process: any;
@@ -13,7 +13,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         canvas.width = imageData.width;
         canvas.height = imageData.height;
 
-        lastChatImage = null;
+        lastChatImages = null;
         lastChatData = null;
     }
 
@@ -29,8 +29,8 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
     abortController = new AbortController();
 
-    const chatIsUsed = (chatData.top.length || chatData.bottom.length);
-    const chatNeedsRender = !lastChatImage || renderChat;
+    const chatIsUsed = (chatData.top.text.length || chatData.bottom.text.length);
+    const chatNeedsRender = !lastChatImages || renderChat;
 
     const drawImage = () => {
         const filters: string[] = Object.entries(imageData.options).map(([ key, value ]) => {
@@ -169,14 +169,17 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
         //const response = await fetch("http://localhost:8080", {
             method: "POST",
             signal: abortController.signal,
+            headers: {
+                "Accept": "image/png"
+            },
             body: JSON.stringify({
                 offset: chatData.offset,
                 fontSize: chatData.fontSize,
                 width: Math.min(imageData.width, 3840),
                 height: Math.min(imageData.height, 2160),
 
-                top: chatData.top.split('\n').map(handleLine).filter(Boolean),
-                bottom: chatData.bottom.split('\n').map(handleLine).filter(Boolean)
+                top: chatData.top.text.split('\n').map(handleLine).filter(Boolean),
+                bottom: chatData.bottom.text.split('\n').map(handleLine).filter(Boolean)
             })
         });
 
@@ -186,39 +189,78 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     
         const urlCreator = window.URL || window.webkitURL;
         const result = await response.blob();
-    
-        const chatImage = new Image();
-    
-        chatImage.src = urlCreator.createObjectURL(result);
-    
-        chatImage.onload = function() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
 
-            if(image) {
-                drawImage();
-            }
+        const topLength = parseInt(response.headers.get("X-Image-Length") ?? "0");
+
+        const topImageBlob = result.slice(0, topLength);
+        const bottomImageBlob = result.slice(topLength + 1);
+
+        const [ topImage, bottomImage ] = await Promise.allSettled<HTMLImageElement | null>([
+            (topImageBlob.size > 0)?(
+                new Promise((resolve, reject) => {
+                    const chatImage = new Image();
         
-            lastChatImage = chatImage;
-            lastChatData = {
-                ...chatData
-            };
+                    chatImage.src = urlCreator.createObjectURL(topImageBlob);
+                
+                    chatImage.onload = () => {
+                        resolve(chatImage);
+                    };
 
-            context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
+                    chatImage.onerror = (error) => {
+                        console.error(error);
 
-            context.restore();
+                        reject();
+                    };
+                })
+            ):(null),
+            (bottomImageBlob.size > 0)?(
+                new Promise((resolve, reject) => {
+                    const chatImage = new Image();
+        
+                    chatImage.src = urlCreator.createObjectURL(bottomImageBlob);
+                
+                    chatImage.onload = () => {
+                        resolve(chatImage);
+                    };
+
+                    chatImage.onerror = (error) => {
+                        console.error(error);
+
+                        reject();
+                    };
+                })
+            ):(null),
+        ]);
+    
+        lastChatImages = [
+            (topImage.status === "fulfilled")?(topImage.value):(null),
+            (bottomImage.status === "fulfilled")?(bottomImage.value):(null)
+        ];
+        lastChatData = {
+            ...chatData
         };
     }
-    else {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        
-        if(image) {
-            drawImage();
-        }
+    
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-        if(lastChatImage) {
-            context.drawImage(lastChatImage, 0, 0, lastChatImage.width, lastChatImage.height, 0, 0, lastChatImage.width, lastChatImage.height);
-        }
-
-        context.restore();
+    if(image) {
+        drawImage();
     }
+
+    if(lastChatImages) {
+        console.log(lastChatImages);
+
+        if(lastChatImages[0]) {
+            context.drawImage(lastChatImages[0], 0, 0, lastChatImages[0].width, lastChatImages[0].height, 0, 0, lastChatImages[0].width, lastChatImages[0].height);
+        }
+        
+        if(lastChatImages[1]) {
+            context.drawImage(lastChatImages[1],
+                0, 0, lastChatImages[1].width, lastChatImages[1].height,
+                0, imageData.height - lastChatImages[1].height, lastChatImages[1].width, lastChatImages[1].height
+            );
+        }
+    }
+
+    context.restore();
 }

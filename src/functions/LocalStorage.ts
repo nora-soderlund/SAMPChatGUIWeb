@@ -2,12 +2,12 @@ import { ChatData, defaultChatData } from "../interfaces/ChatData";
 import { ImageData } from "../interfaces/ImageData";
 
 export type LocalStorageData = {
-    version?: 1;
+    version?: 1 | 2;
     chatData: ChatData;
     imageData: ImageData;
 };
 
-export const currentLocalStorageVersion = 1; 
+export const currentLocalStorageVersion = 2; 
 
 export function loadLocalStorageData() {
     const rawData = localStorage.getItem("options");
@@ -28,6 +28,20 @@ export function loadLocalStorageData() {
                 ...defaultChatData.offset
             };
         }
+
+        saveLocalStorageData(localStorageData);
+    }
+    
+    if(localStorageData.version === 1) {
+        localStorageData.version = 2;
+        
+        localStorageData.chatData.top = {
+            text: localStorageData.chatData.top as unknown as string
+        };
+        
+        localStorageData.chatData.bottom = {
+            text: localStorageData.chatData.bottom as unknown as string
+        };
 
         saveLocalStorageData(localStorageData);
     }

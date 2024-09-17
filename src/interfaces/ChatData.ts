@@ -1,6 +1,6 @@
 export type ChatData = {
-    top: string;
-    bottom: string;
+    top: ChatSectionData;
+    bottom: ChatSectionData;
   
     fontSize: number;
   
@@ -15,9 +15,18 @@ export type ChatData = {
     includeBroadcasts: boolean;
 };
 
+export type ChatSectionData = {
+    text: string;
+};
+
 export const defaultChatData: ChatData = {
-    top: "* Ray Maverick waves.",
-    bottom: "",
+    top: {
+        text: "* Ray Maverick waves."
+    },
+    
+    bottom: {
+        text: ""
+    },
   
     fontSize: 18,
   
