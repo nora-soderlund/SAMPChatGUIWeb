@@ -469,6 +469,14 @@ export default function App() {
                 <p><small>Your top text starts with a new line, remove the empty line to get rid of the empty space on the top.</small></p>
               )}
               
+              {(chatData.top.text.endsWith('\n')) && (
+                <p><small>Your top text end with a new line, remove the empty line to get rid of the empty space on the bottom.</small></p>
+              )}
+              
+              {(chatData.bottom.text.startsWith('\n')) && (
+                <p><small>Your bottom text starts with a new line, remove the empty line to get rid of the empty space on the top.</small></p>
+              )}
+              
               {(chatData.bottom.text.endsWith('\n')) && (
                 <p><small>Your bottom text ends with a new line, remove the empty line to get rid of the empty space on the bottom.</small></p>
               )}
