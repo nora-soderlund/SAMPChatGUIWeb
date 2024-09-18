@@ -19,6 +19,8 @@ export type ChatSectionData = {
     text: string;
 
     useBackground: boolean;
+    useMask: boolean;
+    maskWidth: number;
     background: string;
     outside: boolean;
 };
@@ -28,6 +30,8 @@ export const defaultChatData: ChatData = {
         text: "* Ray Maverick waves.",
         background: "black",
         useBackground: false,
+        useMask: false,
+        maskWidth: 5,
         outside: false
     },
 
@@ -35,6 +39,8 @@ export const defaultChatData: ChatData = {
         text: "",
         background: "black",
         useBackground: false,
+        useMask: false,
+        maskWidth: 5,
         outside: false
     },
   

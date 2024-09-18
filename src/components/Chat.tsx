@@ -32,11 +32,11 @@ export default function Chat({ id, title, chatSection, onChange }: ChatProps) {
                     }}/>
 
             <p style={{ padding: "0 10px", margin: "5px 0" }}><small>If you want the chat to be put on a background, enter the color here.</small></p>
-                
-                <div style={{
-                    display: "flex",
-                    flexDirection: "row"
-                }}>
+            
+            <div style={{
+                display: "flex",
+                flexDirection: "row"
+            }}>
                 <fieldset>
                     <input id={`${id}-useBackground`} type="checkbox" checked={chatSection.useBackground} onChange={() => onChange({
                     ...chatSection,
@@ -50,7 +50,21 @@ export default function Chat({ id, title, chatSection, onChange }: ChatProps) {
                     ...chatSection,
                     background: event.target.value
                 })}/>
-                </div>
+                
+                <fieldset>
+                    <input id={`${id}-useMask`} disabled={!chatSection.useBackground} type="checkbox" checked={chatSection.useMask} onChange={() => onChange({
+                    ...chatSection,
+                    useMask: !chatSection.useMask
+                    })}/>
+
+                    <label htmlFor={`${id}-useMask`}>Use mask for background</label>
+                </fieldset>
+
+                <input disabled={!chatSection.useBackground || !chatSection.useMask} type="number" placeholder="5" value={chatSection.maskWidth} style={{ flex: 1 }} onChange={(event) => onChange({
+                    ...chatSection,
+                    maskWidth: parseInt(event.target.value)
+                })}/>
+            </div>
                 
               <fieldset>
                 <input id={`${id}-outside`} type="checkbox" checked={chatSection.outside} onChange={() => onChange({

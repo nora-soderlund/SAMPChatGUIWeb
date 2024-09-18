@@ -19,7 +19,6 @@ const defaultCropperData: CropperData = {
 
 export default function App() {
   const imageRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
 
   const [chatData, setChatData] = useState<ChatData>(defaultChatData);
