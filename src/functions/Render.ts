@@ -168,7 +168,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
 
         const [ topImageDataLength, topImageLength, bottomImageDataLength, _bottomImageLength ] = customContentLength.split(',').map((value) => parseInt(value));
 
-        const topImageBlob = result.slice((topImageDataLength + 1), topImageLength);
+        const topImageBlob = result.slice((topImageDataLength + 1), topImageDataLength + 1 + topImageLength);
         const bottomImageBlob = result.slice(topImageDataLength + 1 + topImageLength + 1 + bottomImageDataLength + 1);
 
         const [ topImageData, topImage, bottomImageData, bottomImage ]: [ PromiseSettledResult<string>, PromiseSettledResult<HTMLImageElement>, PromiseSettledResult<string>, PromiseSettledResult<HTMLImageElement>] = await Promise.allSettled([
@@ -298,7 +298,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 }
             }
 
-            context.drawImage(topImage, 0, 0, topImage.width, topImage.height, 0, 0, topImage.width, topImage.height);
+            context.drawImage(topImage,
+                0, 0, topImage.width, topImage.height,
+                0, 0, topImage.width, topImage.height
+            );
         }
         
         if(bottomImage && chatData.bottom.text.length) {
