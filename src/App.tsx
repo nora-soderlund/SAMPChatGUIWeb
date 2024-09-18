@@ -450,6 +450,7 @@ export default function App() {
 
             <div className="content" style={{
               display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
             }}>
               <div style={{
@@ -464,6 +465,14 @@ export default function App() {
                   width: "100%",
                 }}/>
               </div>
+              
+              {(chatData.top.text.startsWith('\n')) && (
+                <p><small>Your top text starts with a new line, remove the empty line to get rid of the empty space on the top.</small></p>
+              )}
+              
+              {(chatData.bottom.text.endsWith('\n')) && (
+                <p><small>Your bottom text ends with a new line, remove the empty line to get rid of the empty space on the bottom.</small></p>
+              )}
             </div>
           </div>
 
