@@ -50,21 +50,26 @@ export default function Chat({ id, title, chatSection, onChange }: ChatProps) {
                     ...chatSection,
                     background: event.target.value
                 })}/>
-                
-                <fieldset>
-                    <input id={`${id}-useMask`} disabled={!chatSection.useBackground} type="checkbox" checked={chatSection.useMask} onChange={() => onChange({
-                    ...chatSection,
-                    useMask: !chatSection.useMask
+                </div>
+
+                <div style={{
+                    display: "flex",
+                    flexDirection: "row"
+                }}>
+                    <fieldset>
+                        <input id={`${id}-useMask`} disabled={!chatSection.useBackground} type="checkbox" checked={chatSection.useMask} onChange={() => onChange({
+                        ...chatSection,
+                        useMask: !chatSection.useMask
+                        })}/>
+
+                        <label htmlFor={`${id}-useMask`}>Use mask for background</label>
+                    </fieldset>
+
+                    <input disabled={!chatSection.useBackground || !chatSection.useMask} type="number" placeholder="5" value={chatSection.maskWidth} style={{ flex: 1 }} onChange={(event) => onChange({
+                        ...chatSection,
+                        maskWidth: parseInt(event.target.value)
                     })}/>
-
-                    <label htmlFor={`${id}-useMask`}>Use mask for background</label>
-                </fieldset>
-
-                <input disabled={!chatSection.useBackground || !chatSection.useMask} type="number" placeholder="5" value={chatSection.maskWidth} style={{ flex: 1 }} onChange={(event) => onChange({
-                    ...chatSection,
-                    maskWidth: parseInt(event.target.value)
-                })}/>
-            </div>
+                </div>
                 
               <fieldset>
                 <input id={`${id}-outside`} type="checkbox" checked={chatSection.outside} onChange={() => onChange({
