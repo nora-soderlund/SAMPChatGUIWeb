@@ -396,45 +396,18 @@ export default function App() {
           }}>
             <div style={{
               display: "flex",
+              height: "100%",
               flexDirection: "column",
-              gap: 10
+              gap: 10,
+              justifyContent: "center",
             }}>
-              {(image)?(
+              {(image) && (
                 <div style={{
-                  background: "rgba(0, 0, 0, .1)",
                   width: "90%",
-                  aspectRatio: image.width / image.height,
+                  boxSizing: "border-box",
                   position: "relative"
                 }}>
                   <ImageCropper image={image} imageData={imageData} cropperData={cropperData} onChange={setCropperData}/>
-
-                  <canvas ref={canvasRef} style={{
-                    width: imageData.width,
-                    height: imageData.height,
-                    pointerEvents: "none",
-                    userSelect: "none",
-                    position: "absolute",
-                    left: 0,
-                    top: "100%"
-                  }}/>
-                </div>
-              ):(
-                <div style={{
-                  background: "rgba(0, 0, 0, .1)",
-                  width: imageData.width,
-                  height: imageData.height,
-                  overflow: "hidden",
-                  position: "relative"
-                }}>
-                  <canvas ref={canvasRef} style={{
-                    width: imageData.width,
-                    height: imageData.height,
-                    pointerEvents: "none",
-                    userSelect: "none",
-                    position: "absolute",
-                    left: 0,
-                    top: 0
-                  }}/>
                 </div>
               )}
             </div>
@@ -480,19 +453,15 @@ export default function App() {
               justifyContent: "center",
             }}>
               <div style={{
-                background: "rgba(0, 0, 0, .1)",
-                width: "100%",
-                maxWidth: imageData.width,
-                aspectRatio: imageData.width / imageData.height,
                 overflow: "hidden",
-                position: "relative"
+                position: "relative",
+                width: "90%",
+                display: "flex",
+                justifyContent: "center"
               }}>
                 <canvas ref={previewRef} style={{
+                  background: "rgba(0, 0, 0, .1)",
                   width: "100%",
-                  height: "100%",
-                  position: "absolute",
-                  left: 0,
-                  top: 0
                 }}/>
               </div>
             </div>

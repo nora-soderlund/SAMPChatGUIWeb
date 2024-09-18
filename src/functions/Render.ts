@@ -211,8 +211,14 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
     canvas.width = imageData.width;
     canvas.height = totalHeight;
 
+    canvas.style.aspectRatio = (canvas.width / canvas.height).toString();
+
     if(canvas.parentElement) { // well... duh
-        canvas.parentElement.style.height = `${canvas.height}px`;
+        //canvas.parentElement.style.aspectRatio = (canvas.width / canvas.height).toString();
+        //canvas.style.width = `${canvas.width}px`;
+        
+        canvas.style.maxWidth = `${canvas.width}px`;
+        canvas.style.maxHeight = `${canvas.height}px`;
     }
 
     const context = canvas.getContext("2d");
