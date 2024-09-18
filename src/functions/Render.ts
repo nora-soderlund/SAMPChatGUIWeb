@@ -87,6 +87,9 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                 
                 color = "33AA33";
             }
+            else if(line.startsWith("[Package]")) {
+                color = "33AA33";
+            }
             else if(line.startsWith("[SAN]")) {
                 if(!chatData.includeBroadcasts) {
                     return null;
@@ -286,7 +289,7 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                         if(mask.width === 0) {
                             continue;
                         }
-                        
+
                         context.fillRect(mask.left - padding, mask.top - padding, mask.width + padding + padding, mask.height + padding + padding);
                     }
                 }
