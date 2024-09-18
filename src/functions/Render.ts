@@ -283,6 +283,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                     const padding = chatData.top.maskWidth;
                     
                     for(let mask of topImageData.masks) {
+                        if(mask.width === 0) {
+                            continue;
+                        }
+                        
                         context.fillRect(mask.left - padding, mask.top - padding, mask.width + padding + padding, mask.height + padding + padding);
                     }
                 }
@@ -304,6 +308,10 @@ export async function render(canvas: HTMLCanvasElement, image: HTMLImageElement 
                     const padding = chatData.bottom.maskWidth;
                     
                     for(let mask of bottomImageData.masks) {
+                        if(mask.width === 0) {
+                            continue;
+                        }
+
                         context.fillRect(mask.left - padding, top + mask.top - padding, mask.width + padding + padding, mask.height + padding + padding);
                     }
                 }
