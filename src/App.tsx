@@ -7,6 +7,8 @@ import { ImageData, defaultImageData } from "./interfaces/ImageData";
 import { ChatData, defaultChatData } from "./interfaces/ChatData";
 import Option from "./components/Option";
 import Chat from "./components/Chat";
+import PreviewArea from "./components/PreviewArea";
+import { getChatLinesFromTime } from "./functions/ParseChatLines";
 
 const defaultCropperData: CropperData = {
   x: 0,
@@ -17,12 +19,19 @@ const defaultCropperData: CropperData = {
   scaleY: 1
 };
 
+type LocalFile<T> = {
+  value: T;
+  lastModified: Date;
+};
+
 export default function App() {
   const imageRef = useRef<HTMLInputElement>(null);
+  const chatlogRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
 
   const [chatData, setChatData] = useState<ChatData>(defaultChatData);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [chatlog, setChatlog] = useState<LocalFile<string> | null>(null);
+  const [image, setImage] = useState<LocalFile<HTMLImageElement> | null>(null);
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
   const [cropperData, setCropperData] = useState<CropperData>(defaultCropperData);
 
@@ -43,7 +52,7 @@ export default function App() {
     let timeout: number | null = setTimeout(() => {
       timeout = null;
 
-      render(previewRef.current!, image, imageData, cropperData, chatData, false);
+      render(previewRef.current!, image?.value ?? null, imageData, cropperData, chatData, false);
       
       saveLocalStorageData({
         imageData,
@@ -66,7 +75,7 @@ export default function App() {
     let timeout: number | null = setTimeout(() => {
       timeout = null;
 
-      render(previewRef.current!, image, imageData, cropperData, chatData, true);
+      render(previewRef.current!, image?.value ?? null, imageData, cropperData, chatData, true);
       
       saveLocalStorageData({
         imageData,
@@ -85,9 +94,9 @@ export default function App() {
     if(image) {
       let fontSize = 18;
 
-      if(image.width < 1024) {
+      if(image.value.width < 1024) {
         fontSize = 14;
-      } else if(image.width == 1024) {
+      } else if(image.value.width == 1024) {
         fontSize = 16;
       } else {
         fontSize = 18;
@@ -100,6 +109,24 @@ export default function App() {
     }
   }, [ image ]);
 
+  useEffect(() => {
+    if(chatlog && image) {
+      const lines = getChatLinesFromTime(chatData, chatlog.value, image.lastModified, 10, 1.5);
+
+      setChatData({
+        ...chatData,
+        top: {
+          ...chatData.top,
+          text: lines
+        },
+        bottom: {
+          ...chatData.bottom,
+          text: ""
+        }
+      });
+    }
+  }, [chatlog, image]);
+
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -110,13 +137,38 @@ export default function App() {
             const image = new Image();
 
             image.onload = () => {
-              setImage(image);
+              setImage({
+                value: image,
+                lastModified: new Date(file.lastModified)
+              });
             };
 
             image.src = e.target!.result as string;
         };
 
         reader.readAsDataURL(file);
+    }
+  }, [imageData]);
+
+  const handleChatlogChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const chatlog = e.target!.result as string;
+
+          console.log({ file });
+          console.log({ chatlog });
+
+          setChatlog({
+            value: chatlog,
+            lastModified: new Date(file.lastModified)
+          });
+        };
+
+        reader.readAsText(file);
     }
   }, [imageData]);
 
@@ -137,7 +189,10 @@ export default function App() {
                 const image = new Image();
     
                 image.onload = () => {
-                  setImage(image);
+                  setImage({
+                    value: image,
+                    lastModified: new Date(file.lastModified)
+                  });
                 };
     
                 image.src = e.target!.result as string;
@@ -158,7 +213,10 @@ export default function App() {
           const image = new Image();
 
           image.onload = () => {
-            setImage(image);
+            setImage({
+              value: image,
+              lastModified: new Date(file.lastModified)
+            });
           };
 
           image.src = e.target!.result as string;
@@ -171,7 +229,9 @@ export default function App() {
   }, []);
 
   return (
-    <div id="app">
+    <div id="app"
+    onDrop={handleDrop}
+    onDragOver={(event) => event.preventDefault()}>
       <div style={{
         display: "flex",
         height: "100%"
@@ -185,6 +245,7 @@ export default function App() {
           boxSizing: "border-box",
           gap: 20
         }}>
+
           <div style={{
             border: "1px solid #283142",
             background: "#1c2238",
@@ -197,8 +258,6 @@ export default function App() {
             boxSizing: "border-box",
             cursor: "pointer"
           }}
-          onDrop={handleDrop}
-          onDragOver={(event) => event.preventDefault()}
           onClick={() => imageRef.current?.click()}
           >
             <p style={{
@@ -211,6 +270,36 @@ export default function App() {
             <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
               display: "none"
             }}/>
+          </div>
+
+          <hr/>
+          
+          <div style={{
+            border: "1px solid #283142",
+            background: "#1c2238",
+            borderRadius: 10,
+            padding: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            boxSizing: "border-box",
+            cursor: "pointer"
+          }}
+          onClick={() => chatlogRef.current?.click()}
+          >
+            <p style={{
+              textAlign: "center"
+            }}>
+              <b>Choose your chatlog file or drag & drop it here</b><br/>
+              Upload your chatlog file and get automatic extraction or enter your chat manually
+            </p>
+
+            <input ref={chatlogRef} type="file" accept="text/plain" onChange={handleChatlogChange} style={{
+              display: "none"
+            }}/>
+
+            <p style={{margin: 0}}><i>Experimental / work in progress</i></p>
           </div>
 
           <hr/>
@@ -406,7 +495,7 @@ export default function App() {
                   boxSizing: "border-box",
                   position: "relative"
                 }}>
-                  <ImageCropper image={image} imageData={imageData} cropperData={cropperData} onChange={setCropperData}/>
+                  <ImageCropper image={image.value} imageData={imageData} cropperData={cropperData} onChange={setCropperData}/>
                 </div>
               )}
             </div>
@@ -428,138 +517,7 @@ export default function App() {
           </div>
         </div>
 
-        
-        <div style={{
-          overflowY: "scroll",
-          flex: 1,
-          padding: 10,
-          boxSizing: "border-box",
-          direction: "rtl"
-        }}>
-          <div style={{
-          display: "flex",
-          flexDirection: "column",
-            direction: "ltr",
-            gap: 20,
-          }}>
-          <div className="modal">
-            <div className="header">
-              <p>Preview</p>
-            </div>
-
-            <div className="content" style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}>
-              <div style={{
-                overflow: "hidden",
-                position: "relative",
-                width: "90%",
-                display: "flex",
-                justifyContent: "center"
-              }}>
-                <canvas ref={previewRef} style={{
-                  background: "rgba(0, 0, 0, .1)",
-                  width: "100%",
-                }}/>
-              </div>
-              
-              {(chatData.top.text.startsWith('\n')) && (
-                <p><small>Your top text starts with a new line, remove the empty line to get rid of the empty space on the top.</small></p>
-              )}
-              
-              {(chatData.top.text.endsWith('\n')) && (
-                <p><small>Your top text end with a new line, remove the empty line to get rid of the empty space on the bottom.</small></p>
-              )}
-              
-              {(chatData.bottom.text.startsWith('\n')) && (
-                <p><small>Your bottom text starts with a new line, remove the empty line to get rid of the empty space on the top.</small></p>
-              )}
-              
-              {(chatData.bottom.text.endsWith('\n')) && (
-                <p><small>Your bottom text ends with a new line, remove the empty line to get rid of the empty space on the bottom.</small></p>
-              )}
-            </div>
-          </div>
-
-          {(image) && (
-            <div className="modal">
-              <div className="header">
-                <p>Filter</p>
-              </div>
-
-              <div className="content" style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 10
-              }}>
-                <div style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 10,
-                }}>
-                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Brightness" option="brightness"/>
-                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Grayscale" option="grayscale"/>
-                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Sepia" option="sepia"/>
-                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Saturate" option="saturate"/>
-                  <Option image={image} imageData={imageData} setImageData={setImageData} text="Contrast" option="contrast"/>
-                </div>
-              </div>
-            </div>
-          )}
-
-            <div style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 10,
-              justifyContent: "flex-end"
-            }}>
-              <button style={{ width: 160 }} onClick={() => {
-                if(!previewRef.current) {
-                  return;
-                }
-
-                try {
-                  previewRef.current.toBlob(blob => blob && navigator.clipboard.write([
-                    new ClipboardItem({
-                      'image/png': blob
-                    })
-                  ]));
-
-                  alert("Copied to your clipboard.");
-                }
-                catch(error) {
-                  console.error(error);
-
-                  alert("Failed to copy to the clipboard.");
-                }
-              }}>
-                Copy to clipboard
-              </button>
-
-              <button className="secondary" style={{ width: 160 }} onClick={() => {
-                if(!previewRef.current) {
-                  return;
-                }
-                
-                const downloadLink = document.createElement('a');
-                downloadLink.setAttribute('download', `Screenshot ${new Date().toISOString()}.png`);
-
-                previewRef.current.toBlob(blob => {
-                  if(blob) {
-                    const url = URL.createObjectURL(blob);
-                    downloadLink.setAttribute('href', url);
-                    downloadLink.click();
-                  }
-              });
-              }}>
-                Save to disk
-              </button>
-            </div>
-          </div>
-        </div>
+        <PreviewArea previewRef={previewRef} chatData={chatData} image={image?.value ?? null} imageData={imageData} setImageData={setImageData}/>
       </div>
     </div>
   );
