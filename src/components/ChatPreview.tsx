@@ -53,11 +53,11 @@ export default function ChatPreview({ image, imageData, cropperData, chatData: i
           ...chatData,
           top: {
             ...chatData.top,
-            text: getChatLinesFromTime(chatData, chatlog.value, image.lastModified, top.lines, top.seconds)
+            text: getChatLinesFromTime(chatData, chatlog.value, image.lastModified, top.lines, top.seconds).trim()
           },
           bottom: {
             ...chatData.bottom,
-            text: (bottom.include)?(getChatLinesFromTime(chatData, chatlog.value, bottomFrom, bottom.lines, bottom.seconds, image.lastModified)):("")
+            text: (bottom.include)?(getChatLinesFromTime(chatData, chatlog.value, bottomFrom, bottom.lines, bottom.seconds, image.lastModified).trim()):("")
           }
         });
       }
