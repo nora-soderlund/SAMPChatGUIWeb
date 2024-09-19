@@ -5,7 +5,6 @@ import ImageCropper, { CropperData } from "./components/ImageCropper";
 import { loadLocalStorageData, saveLocalStorageData } from "./functions/LocalStorage";
 import { ImageData, defaultImageData } from "./interfaces/ImageData";
 import { ChatData, defaultChatData } from "./interfaces/ChatData";
-import Option from "./components/Option";
 import Chat from "./components/Chat";
 import PreviewArea from "./components/PreviewArea";
 import { getChatLinesFromTime } from "./functions/ParseChatLines";
