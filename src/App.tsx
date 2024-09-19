@@ -1,5 +1,4 @@
 import { ChangeEvent, DragEvent, useCallback, useEffect, useRef, useState } from "react";
-
 import { render } from "./functions/Render";
 import ImageCropper, { CropperData } from "./components/ImageCropper";
 import { loadLocalStorageData, saveLocalStorageData } from "./functions/LocalStorage";
@@ -7,7 +6,7 @@ import { ImageData, defaultImageData } from "./interfaces/ImageData";
 import { ChatData, defaultChatData } from "./interfaces/ChatData";
 import Chat from "./components/Chat";
 import PreviewArea from "./components/PreviewArea";
-import { getChatLinesFromTime } from "./functions/ParseChatLines";
+import ChatPreview from "./components/ChatPreview";
 
 const defaultCropperData: CropperData = {
   x: 0,
@@ -18,7 +17,8 @@ const defaultCropperData: CropperData = {
   scaleY: 1
 };
 
-type LocalFile<T> = {
+export type LocalFile<T> = {
+  name: string;
   value: T;
   lastModified: Date;
 };
@@ -33,6 +33,7 @@ export default function App() {
   const [image, setImage] = useState<LocalFile<HTMLImageElement> | null>(null);
   const [imageData, setImageData] = useState<ImageData>(defaultImageData);
   const [cropperData, setCropperData] = useState<CropperData>(defaultCropperData);
+  const [viewingChatlog, setViewingChatlog] = useState(true);
 
   useEffect(() => {
     const localStorageData = loadLocalStorageData();
@@ -108,24 +109,6 @@ export default function App() {
     }
   }, [ image ]);
 
-  useEffect(() => {
-    if(chatlog && image) {
-      const lines = getChatLinesFromTime(chatData, chatlog.value, image.lastModified, 10, 1.5);
-
-      setChatData({
-        ...chatData,
-        top: {
-          ...chatData.top,
-          text: lines
-        },
-        bottom: {
-          ...chatData.bottom,
-          text: ""
-        }
-      });
-    }
-  }, [chatlog, image]);
-
   const handleImageChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -137,6 +120,7 @@ export default function App() {
 
             image.onload = () => {
               setImage({
+                name: file.name,
                 value: image,
                 lastModified: new Date(file.lastModified)
               });
@@ -158,10 +142,8 @@ export default function App() {
         reader.onload = (e) => {
           const chatlog = e.target!.result as string;
 
-          console.log({ file });
-          console.log({ chatlog });
-
           setChatlog({
+            name: file.name,
             value: chatlog,
             lastModified: new Date(file.lastModified)
           });
@@ -183,21 +165,37 @@ export default function App() {
 
           if(file) {
             const reader = new FileReader();
-    
-            reader.onload = (e) => {
+
+            if(file.name.endsWith("txt")) {
+              reader.onload = (e) => {
+                const chatlog = e.target!.result as string;
+      
+                setChatlog({
+                  name: file.name,
+                  value: chatlog,
+                  lastModified: new Date(file.lastModified)
+                });
+              };
+      
+              reader.readAsText(file);
+            }
+            else {
+              reader.onload = (e) => {
                 const image = new Image();
     
                 image.onload = () => {
                   setImage({
+                    name: file.name,
                     value: image,
                     lastModified: new Date(file.lastModified)
                   });
                 };
     
                 image.src = e.target!.result as string;
-            };
-    
-            reader.readAsDataURL(file);
+              };
+      
+              reader.readAsDataURL(file);
+            }
 
             return;
           }
@@ -213,6 +211,7 @@ export default function App() {
 
           image.onload = () => {
             setImage({
+              name: file.name,
               value: image,
               lastModified: new Date(file.lastModified)
             });
@@ -246,59 +245,88 @@ export default function App() {
         }}>
 
           <div style={{
-            border: "1px solid #283142",
-            background: "#1c2238",
-            borderRadius: 10,
-            padding: 10,
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
             flexDirection: "column",
-            boxSizing: "border-box",
-            cursor: "pointer"
-          }}
-          onClick={() => imageRef.current?.click()}
-          >
-            <p style={{
-              textAlign: "center"
-            }}>
-              <b>Choose an image or drag & drop it here</b><br/>
-              Any image format that your browser supports is supported, no size limit
-            </p>
+            gap: 10
+          }}>
+            {(image) && (
+              <div>
+                <p style={{ marginBottom: 0 }}>Current image: {image.name}</p>
+                <p style={{ margin: 0 }}><small>Last modified {image.lastModified.toDateString()}</small></p>
+              </div>
+            )}
+            <div style={{
+              border: "1px solid #283142",
+              background: "#1c2238",
+              borderRadius: 10,
+              padding: 10,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              boxSizing: "border-box",
+              cursor: "pointer"
+            }}
+            onClick={() => imageRef.current?.click()}
+            >
+              <p style={{
+                textAlign: "center"
+              }}>
+                <b>Choose an image or drag & drop it here</b><br/>
+                Any image format that your browser supports is supported, no size limit
+              </p>
 
-            <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
-              display: "none"
-            }}/>
+              <input ref={imageRef} type="file" accept="image/*" onChange={handleImageChange} style={{
+                display: "none"
+              }}/>
+            </div>
           </div>
 
           <hr/>
-          
+
           <div style={{
-            border: "1px solid #283142",
-            background: "#1c2238",
-            borderRadius: 10,
-            padding: 10,
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
             flexDirection: "column",
-            boxSizing: "border-box",
-            cursor: "pointer"
-          }}
-          onClick={() => chatlogRef.current?.click()}
-          >
-            <p style={{
-              textAlign: "center"
-            }}>
-              <b>Choose your chatlog file or drag & drop it here</b><br/>
-              Upload your chatlog file and get automatic extraction or enter your chat manually
-            </p>
+            gap: 10
+          }}>
+            {(chatlog) && (
+              <div>
+                <p style={{ marginBottom: 0 }}>Current chatlog file: {chatlog.name}</p>
+                <p style={{ margin: 0 }}><small>Last modified {chatlog.lastModified.toDateString()}</small></p>
+              </div>
+            )}
+          
+            <div style={{
+              border: "1px solid #283142",
+              background: "#1c2238",
+              borderRadius: 10,
+              padding: 10,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              boxSizing: "border-box",
+              cursor: "pointer"
+            }}
+            onClick={() => chatlogRef.current?.click()}
+            >
+              <p style={{
+                textAlign: "center"
+              }}>
+                <b>Choose your chatlog file or drag & drop it here</b><br/>
+                Upload your chatlog file and get automatic extraction or enter your chat manually
+              </p>
 
-            <input ref={chatlogRef} type="file" accept="text/plain" onChange={handleChatlogChange} style={{
-              display: "none"
-            }}/>
+              <input ref={chatlogRef} type="file" accept="text/plain" onChange={handleChatlogChange} style={{
+                display: "none"
+              }}/>
 
-            <p style={{margin: 0}}><i>Experimental / work in progress</i></p>
+              <p style={{margin: 0}}><i>Experimental / work in progress</i></p>
+            </div>
+
+            {(image) && (
+              <button className="secondary" onClick={() => setViewingChatlog(true)}>Open chatlog selection</button>
+            )}
           </div>
 
           <hr/>
@@ -518,6 +546,13 @@ export default function App() {
 
         <PreviewArea previewRef={previewRef} chatData={chatData} image={image?.value ?? null} imageData={imageData} setImageData={setImageData}/>
       </div>
+
+      {(viewingChatlog && image && chatlog) && (
+        <ChatPreview image={image} imageData={imageData} cropperData={cropperData} chatData={chatData} chatlog={chatlog} onFinish={(chatData) => {
+          setChatData(chatData);
+          setViewingChatlog(false);
+        }}/>
+      )}
     </div>
   );
 };

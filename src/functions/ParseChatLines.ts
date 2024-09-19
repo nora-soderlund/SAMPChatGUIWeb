@@ -4,12 +4,22 @@ export default function parseChatLines(chatData: ChatData, chat: string) {
     return chat.split('\n').map((line) => parseChatLine(chatData, line)).filter(Boolean);
 };
 
-export function getChatLinesFromTime(chatData: ChatData, chat: string, from: Date, count: number, maxMinutes: number) {
+export function getChatLinesFromTime(chatData: ChatData, chat: string, from: Date, count: number, maxMinutes: number, cropFrom: Date | null = null) {
     const fromHours = from.getHours();
     const fromMinutes = from.getMinutes();
     const fromSeconds = from.getSeconds();
 
     const fromTotalSeconds = (fromHours * 3600) + (fromMinutes * 60) + fromSeconds;
+
+    let cropFromTotalSeconds = 0;
+    
+    if(cropFrom) {
+        const cropFromHours = cropFrom.getHours();
+        const cropFromMinutes = cropFrom.getMinutes();
+        const cropFromSeconds = cropFrom.getSeconds();
+        
+        cropFromTotalSeconds = (cropFromHours * 3600) + (cropFromMinutes * 60) + cropFromSeconds;
+    }
     
     const maxTotalSeconds = (maxMinutes * 60);
 
@@ -21,7 +31,7 @@ export function getChatLinesFromTime(chatData: ChatData, chat: string, from: Dat
 
             const lineTotalSeconds = (hour * 3600) + (minute * 60) + second;
 
-            if (lineTotalSeconds < fromTotalSeconds && lineTotalSeconds > (fromTotalSeconds - maxTotalSeconds)) {
+            if (lineTotalSeconds < fromTotalSeconds && lineTotalSeconds > (fromTotalSeconds - maxTotalSeconds) && lineTotalSeconds >= cropFromTotalSeconds) {
                 if(parseChatLine(chatData, line)) {
                     return line;
                 }
@@ -31,13 +41,12 @@ export function getChatLinesFromTime(chatData: ChatData, chat: string, from: Dat
         return null;
     }).filter(Boolean);
 
+    if(cropFrom) {
+        return lines.slice(0, Math.min(lines.length, count)).join('\n');
+    } 
+
     const start = Math.max(0, lines.length - count);
     const end = Math.min(start + count, lines.length);
-
-    console.log({
-        lines,
-        cropped: lines.slice(start, end)
-    });
 
     return lines.slice(start, end).join('\n');
 };

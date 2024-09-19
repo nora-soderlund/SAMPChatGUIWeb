@@ -42,6 +42,8 @@ body {
 }
 
 .modal {
+    background: #1a1c2f;
+    
     display: flex;
     flex-direction: column;
 }
