@@ -143,10 +143,10 @@ function parseChatLine(chatData: ChatData, line: string) {
 
         color = "FF8282";
     }
-    else if(line === "_______Vehicle Weapon Package:_______") {
+    else if(line === "_______Vehicle Weapon Package:_______" || line.includes("Weapon Packages")) {
         color = "33AA33";
     }
-    else if(/^\[\s([0-9]+).\s/.test(line)) {
+    else if(/^\[\s([0-9]+).\s/.test(line) || /^\{FF6347\}\[\s\{FFFFFF\}\s([0-9]+).\s/.test(line)) {
         color = "F0F8FF";
     }
     else if(line.includes("You will spawn now with")) {
