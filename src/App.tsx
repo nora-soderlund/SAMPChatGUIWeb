@@ -548,8 +548,13 @@ export default function App() {
       </div>
 
       {(viewingChatlog && image && chatlog) && (
-        <ChatPreview image={image} imageData={imageData} cropperData={cropperData} chatData={chatData} chatlog={chatlog} onFinish={(chatData) => {
-          setChatData(chatData);
+        <ChatPreview image={image} imageData={imageData} cropperData={cropperData} chatData={chatData} chatlog={chatlog} onFinish={({ top, bottom }) => {
+          setChatData({
+            ...chatData,
+            top,
+            bottom
+          });
+          
           setViewingChatlog(false);
         }}/>
       )}
