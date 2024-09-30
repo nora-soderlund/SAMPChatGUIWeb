@@ -109,6 +109,9 @@ function parseChatLine(chatData: ChatData, line: string) {
     else if (line.includes(" whispers: ") || /([A-Za-z]+\s[A-Za-z]+)\s+whispers(.*):\s+(.*)/.test(line)) {
         color = "FFFF00";
     }
+    else if(line.startsWith("You've transferred ") || line.includes("has given you a")) {
+        color = "B4B5B7";
+    }
     else if (line.includes("shouts: ") || line.includes("screams: ")) {
         color = "FFFFFF";
     }
@@ -152,8 +155,14 @@ function parseChatLine(chatData: ChatData, line: string) {
     else if(line.includes("You will spawn now with")) {
         color = "33AA33";
     }
-    else if(line.startsWith("[Drugs] You've taken") || line.startsWith("You've taken")) {
+    else if(line.endsWith(" Drugs:") || line.endsWith(" Weapon Packages:") || line.startsWith("{FF6347}[ ")) {
+        color = "FF6347";
+    }
+    else if(line.startsWith("[Drugs] You've taken") || line.startsWith("You've taken") || line.startsWith("You have taken") || line.startsWith("You've put a")) {
         color = "FFFF00";
+    }
+    else if(line.startsWith("   You have received") || line.startsWith("   You have sent")) {
+        color = "B4B5B7";
     }
     else if(line.trim().length === 0) {
     }
