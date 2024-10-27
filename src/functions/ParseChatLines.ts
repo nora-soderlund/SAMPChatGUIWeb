@@ -68,6 +68,13 @@ function parseChatLine(chatData: ChatData, line: string) {
         line = '*' + line.substring(1);
         color = "C2A4DA";
     }
+    else if(line.startsWith("[ ! ]")) {
+        if(!chatData.includeNotices) {
+            return null;
+        }
+
+        color = "AFAFAF";
+    }
     else if(line.startsWith("**[CH")) {
         if(!chatData.includeRadio) {
             return null;

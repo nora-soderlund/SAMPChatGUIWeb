@@ -354,6 +354,15 @@ export default function App() {
             
             <div className="content">
               <fieldset>
+                <input id="includeNotices" type="checkbox" checked={chatData.includeNotices} onChange={() => setChatData({
+                  ...chatData,
+                  includeNotices: !chatData.includeNotices
+                })}/>
+
+                <label htmlFor="includeNotices">Include notices</label>
+              </fieldset>
+
+              <fieldset>
                 <input id="includeRadio" type="checkbox" checked={chatData.includeRadio} onChange={() => setChatData({
                   ...chatData,
                   includeRadio: !chatData.includeRadio

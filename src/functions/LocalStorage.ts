@@ -2,12 +2,12 @@ import { ChatData, defaultChatData } from "../interfaces/ChatData";
 import { ImageData } from "../interfaces/ImageData";
 
 export type LocalStorageData = {
-    version?: 1 | 2 | 3 | 4;
+    version?: 1 | 2 | 3 | 4 | 5;
     chatData: ChatData;
     imageData: ImageData;
 };
 
-export const currentLocalStorageVersion = 4; 
+export const currentLocalStorageVersion = 5; 
 
 export function loadLocalStorageData() {
     try {
@@ -75,6 +75,14 @@ export function loadLocalStorageData() {
             
             localStorageData.chatData.top.maskWidth = 3;
             localStorageData.chatData.bottom.maskWidth = 3;
+
+            saveLocalStorageData(localStorageData);
+        }
+        
+        if(localStorageData.version === 4) {
+            localStorageData.version = 5;
+            
+            localStorageData.chatData.includeNotices = true;
 
             saveLocalStorageData(localStorageData);
         }

@@ -13,6 +13,7 @@ export type ChatData = {
     includeRadio: boolean;
     includeAutomatedActions: boolean;
     includeBroadcasts: boolean;
+    includeNotices: boolean;
 };
 
 export type ChatSectionData = {
@@ -55,6 +56,7 @@ export const defaultChatData: ChatData = {
   
     includeRadio: true,
     includeAutomatedActions: false,
-    includeBroadcasts: false
+    includeBroadcasts: false,
+    includeNotices: true
   };
   
