@@ -92,20 +92,22 @@ export default function App() {
 
   useEffect(() => {
     if(image) {
-      let fontSize = 18;
+      if(chatData.fontSize == defaultChatData.fontSize) {
+        let fontSize = 18;
 
-      if(image.value.width < 1024) {
-        fontSize = 14;
-      } else if(image.value.width == 1024) {
-        fontSize = 16;
-      } else {
-        fontSize = 18;
+        if(image.value.width < 1024) {
+          fontSize = 14;
+        } else if(image.value.width == 1024) {
+          fontSize = 16;
+        } else {
+          fontSize = 18;
+        }
+  
+        setChatData({
+          ...chatData,
+          fontSize
+        });
       }
-
-      setChatData({
-        ...chatData,
-        fontSize
-      });
     }
   }, [ image ]);
 
