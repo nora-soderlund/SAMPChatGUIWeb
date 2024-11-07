@@ -71,6 +71,9 @@ function parseChatLine(chatData: ChatData, line: string) {
     else if(line.startsWith("-> ")) {
         color = "FF6347";
     }
+    else if(line.includes(":o< ")) {
+        color = "FFFF00";
+    }
     else if(line.startsWith("[ ! ]")) {
         if(!chatData.includeNotices) {
             return null;
